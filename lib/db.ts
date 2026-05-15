@@ -1,7 +1,16 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ?? "mongodb://localhost:27017/custody-tracker";
+function resolveMongoUri(): string {
+  const uri = process.env.MONGODB_URI?.trim();
+  if (uri) return uri;
+  // On Vercel, never fall back to localhost — that hides a missing env var.
+  if (process.env.VERCEL) {
+    throw new Error(
+      "MONGODB_URI is not set. In Vercel: Project → Settings → Environment Variables, add MONGODB_URI for Production (and Preview if you use it), then redeploy.",
+    );
+  }
+  return "mongodb://localhost:27017/custody-tracker";
+}
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -27,7 +36,7 @@ export async function connectMongo(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI);
+    cached.promise = mongoose.connect(resolveMongoUri());
   }
 
   cached.conn = await cached.promise;
