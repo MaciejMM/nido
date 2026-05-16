@@ -6,7 +6,7 @@ import { setActiveUser } from "@/app/actions/auth";
 import { fetchUsers } from "@/lib/api-client";
 import type { UserDto } from "@/types";
 
-const STORAGE_KEY = "custody-active-user-id";
+const STORAGE_KEY = "nido-active-user-id";
 
 export function useCurrentUser() {
   const [users, setUsers] = useState<UserDto[]>([]);

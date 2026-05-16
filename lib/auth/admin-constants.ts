@@ -1,1 +1,1 @@
-export const ADMIN_SESSION_COOKIE = "custody-admin-session";
+export const ADMIN_SESSION_COOKIE = "nido-admin-session";

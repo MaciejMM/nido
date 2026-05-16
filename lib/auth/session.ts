@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 
 import type { UserRole } from "@/models/User";
 
-export const ACTIVE_USER_COOKIE = "custody-active-user-id";
+export const ACTIVE_USER_COOKIE = "nido-active-user-id";
 
 export interface SessionUser {
   id: string;

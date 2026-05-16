@@ -1,5 +1,6 @@
 import { CustodyEntry } from "@/models/CustodyEntry";
 import { type IUser } from "@/models/User";
+import { getAvailableYears } from "@/services/year.service";
 import type { MonthlyBreakdownItem, StatsDto, StatsFilters } from "@/types";
 import {
   countDaysInYear,
@@ -8,33 +9,13 @@ import {
   toMonthKey,
 } from "@/utils/dates";
 
-function collectAvailableYears(
-  entries: { startDate: Date; endDate: Date }[],
-): number[] {
-  const years = new Set<number>([new Date().getFullYear()]);
-
-  for (const entry of entries) {
-    const startYear = entry.startDate.getUTCFullYear();
-    const endYear = entry.endDate.getUTCFullYear();
-    for (let year = startYear; year <= endYear; year += 1) {
-      years.add(year);
-    }
-  }
-
-  return Array.from(years).sort((a, b) => b - a);
-}
-
 export async function getStats(filters: StatsFilters = {}): Promise<StatsDto> {
-  const entries = await CustodyEntry.find()
-    .populate<{ ownerId: IUser }>("ownerId")
-    .exec();
-
-  const availableYears = collectAvailableYears(
-    entries.map((entry) => ({
-      startDate: entry.startDate,
-      endDate: entry.endDate,
-    })),
-  );
+  const [entries, availableYears] = await Promise.all([
+    CustodyEntry.find()
+      .populate<{ ownerId: IUser }>("ownerId")
+      .exec(),
+    getAvailableYears(),
+  ]);
   const year = filters.year ?? new Date().getFullYear();
 
   let totalDaysParentA = 0;

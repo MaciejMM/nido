@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-const STORAGE_KEY = "custody-selected-year";
+const STORAGE_KEY = "nido-selected-year";
 
 type YearFilterContextValue = {
   year: number;

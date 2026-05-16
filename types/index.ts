@@ -56,6 +56,11 @@ export interface StatsDto {
   availableYears: number[];
 }
 
+export interface TrackingYearDto {
+  id: string;
+  value: number;
+}
+
 export interface ApiErrorBody {
   error: string;
   code?: string;

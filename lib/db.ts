@@ -9,7 +9,7 @@ function resolveMongoUri(): string {
       "MONGODB_URI is not set. In Vercel: Project → Settings → Environment Variables, add MONGODB_URI for Production (and Preview if you use it), then redeploy.",
     );
   }
-  return "mongodb://localhost:27017/custody-tracker";
+  return "mongodb://localhost:27017/nido";
 }
 
 interface MongooseCache {

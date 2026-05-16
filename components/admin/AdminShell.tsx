@@ -2,6 +2,7 @@
 
 import {
   CalendarDaysIcon,
+  CalendarRangeIcon,
   LayoutDashboardIcon,
   LogOutIcon,
   UsersIcon,
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/admin", label: pl.admin.overview, icon: LayoutDashboardIcon },
   { href: "/admin/users", label: pl.admin.users, icon: UsersIcon },
+  { href: "/admin/years", label: pl.admin.years, icon: CalendarRangeIcon },
   { href: "/admin/entries", label: pl.admin.entries, icon: CalendarDaysIcon },
 ];
 

@@ -3,14 +3,15 @@ import type { UserDto } from "@/types";
 
 export const pl = {
   app: {
-    name: "Dni opieki",
-    tagline: "Wspólne śledzenie dni opieki",
-    description: "Śledzenie dni opieki wspólnej",
+    name: "Nido",
+    tagline: "Dwa domy, jedno gniazdo",
+    description:
+      "Wspólne gniazdo na dwa domy — harmonogram opieki, finanse i codzienność rodziny",
   },
   nav: {
     dashboard: "Panel",
     home: "Start",
-    entries: "Wpisy",
+    entries: "Dni",
     admin: "Administracja",
   },
   admin: {
@@ -27,14 +28,35 @@ export const pl = {
     loginFailed: "Logowanie nie powiodło się",
     overview: "Przegląd",
     users: "Użytkownicy",
+    years: "Lata",
     entries: "Wpisy",
     backToApp: "Wróć do aplikacji",
-    overviewSubtitle: "Zarządzaj użytkownikami i wpisami opieki",
+    overviewSubtitle: "Zarządzaj użytkownikami, latami i wpisami opieki",
     usersSubtitle: "Dodawaj i edytuj konta rodziców",
+    yearsSubtitle: "Dodawaj lata dostępne w przełączniku aplikacji",
     entriesSubtitle: "Przeglądaj i usuwaj wszystkie wpisy",
     stats: {
       users: "Użytkownicy",
+      years: "Skonfigurowane lata",
       entries: "Wpisy",
+    },
+    yearsSection: {
+      add: "Dodaj rok",
+      year: "Rok",
+      yearPlaceholder: "np. 2026",
+      empty: "Brak skonfigurowanych lat",
+      hint: "Lata z wpisami opieki pojawią się w aplikacji automatycznie. Tutaj dodajesz lata bez wpisów (np. planowany rok).",
+      created: "Rok dodany",
+      deleted: "Rok usunięty",
+      deleteTitle: "Usunąć rok?",
+      deleteDescription: (year: number) =>
+        `Rok ${year} zostanie usunięty z listy dostępnych lat (o ile nie ma wpisów w tym okresie).`,
+      save: "Dodaj",
+      saving: "Dodawanie…",
+      cancel: "Anuluj",
+      delete: "Usuń",
+      deleting: "Usuwanie…",
+      actions: "Akcje",
     },
     usersSection: {
       add: "Dodaj użytkownika",
@@ -66,7 +88,7 @@ export const pl = {
     title: "Panel",
     subtitle: "Przegląd dni opieki obu rodziców",
     subtitleForYear: (year: number) =>
-      `Dni opieki w ${year} roku (bez weekendów)`,
+      `Harmonogram opieki w ${year} roku (bez weekendów)`,
     recentEntries: "Ostatnie wpisy",
     viewAll: "Zobacz wszystkie",
     empty: "Brak wpisów. Dodaj pierwszy okres opieki.",
@@ -74,7 +96,7 @@ export const pl = {
     noChartData: "Brak danych do wykresu.",
   },
   entries: {
-    title: "Wpisy",
+    title: "Dni",
     subtitle: "Zarządzaj okresami opieki",
     add: "Dodaj wpis",
     edit: "Edytuj wpis",

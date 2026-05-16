@@ -1,10 +1,13 @@
-# Custody Tracker
+# Nido
 
-Mobile-first co-parenting custody day tracker built with Next.js, MongoDB, and ShadCN UI.
+Mobile-first app for co-parenting families in two homes — custody scheduling today, shared finances and more planned. Built with Next.js, MongoDB, and ShadCN UI.
+
+**Tagline:** *Dwa domy, jedno gniazdo*
 
 ## Requirements
 
 - Node.js 20+
+- [pnpm](https://pnpm.io/) 10+ (enable via Corepack: `corepack enable`)
 - MongoDB running locally (`mongod`)
 
 ## Setup
@@ -12,7 +15,7 @@ Mobile-first co-parenting custody day tracker built with Next.js, MongoDB, and S
 1. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 2. Copy environment variables:
@@ -34,13 +37,13 @@ mongod --dbpath /usr/local/var/mongodb
 4. Seed the database with sample users and entries:
 
 ```bash
-npm run seed
+pnpm run seed
 ```
 
 5. Start the development server:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -49,11 +52,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start Next.js dev server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run seed` | Reset and seed MongoDB |
-| `npm run lint` | Run ESLint |
+| `pnpm run dev` | Start Next.js dev server |
+| `pnpm run build` | Production build |
+| `pnpm run start` | Start production server |
+| `pnpm run seed` | Reset and seed MongoDB |
+| `pnpm run lint` | Run ESLint |
 
 ## Mock auth
 
@@ -77,3 +80,7 @@ Use the user switcher in the header to toggle between **Parent A (Anna)** and **
 | DELETE | `/api/entries/:id` | Delete entry |
 | GET | `/api/stats` | Aggregated statistics |
 | GET | `/api/users` | List parents |
+
+## MongoDB
+
+The default database name is `nido`. If you previously used `custody-tracker`, either update `MONGODB_URI` to keep the old database or run `pnpm run seed` after pointing to the new database name.

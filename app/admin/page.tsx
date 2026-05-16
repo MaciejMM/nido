@@ -1,17 +1,19 @@
 import Link from "next/link";
-import { CalendarDaysIcon, UsersIcon } from "lucide-react";
+import { CalendarDaysIcon, CalendarRangeIcon, UsersIcon } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { connectMongo } from "@/lib/db";
 import { pl } from "@/lib/i18n";
 import { CustodyEntry } from "@/models/CustodyEntry";
+import { TrackingYear } from "@/models/TrackingYear";
 import { User } from "@/models/User";
 
 export default async function AdminOverviewPage() {
   await connectMongo();
 
-  const [userCount, entryCount] = await Promise.all([
+  const [userCount, yearCount, entryCount] = await Promise.all([
     User.countDocuments().exec(),
+    TrackingYear.countDocuments().exec(),
     CustodyEntry.countDocuments().exec(),
   ]);
 
@@ -23,6 +25,14 @@ export default async function AdminOverviewPage() {
       icon: UsersIcon,
       stat: userCount,
       statLabel: pl.admin.stats.users,
+    },
+    {
+      href: "/admin/years",
+      label: pl.admin.years,
+      description: pl.admin.yearsSubtitle,
+      icon: CalendarRangeIcon,
+      stat: yearCount,
+      statLabel: pl.admin.stats.years,
     },
     {
       href: "/admin/entries",
@@ -41,7 +51,7 @@ export default async function AdminOverviewPage() {
         <p className="text-sm text-muted-foreground">{pl.admin.overviewSubtitle}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {quickLinks.map(
           ({ href, label, description, icon: Icon, stat, statLabel }) => (
             <Link key={href} href={href}>

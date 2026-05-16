@@ -1,7 +1,16 @@
 {
-  "name": "custody-tracker",
+  "name": "nido",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.24.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "msw",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
