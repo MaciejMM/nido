@@ -1,7 +1,8 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { pl } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 export function AdminForbidden() {
   return (
@@ -13,9 +14,9 @@ export function AdminForbidden() {
         <p className="text-sm text-muted-foreground">
           {pl.admin.forbiddenSubtitle}
         </p>
-        <Button asChild>
-          <Link href="/">{pl.admin.backToApp}</Link>
-        </Button>
+        <Link href="/" className={cn(buttonVariants())}>
+          {pl.admin.backToApp}
+        </Link>
       </div>
     </div>
   );
