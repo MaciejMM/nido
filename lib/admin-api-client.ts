@@ -14,32 +14,6 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return data as T;
 }
 
-export interface AdminSessionDto {
-  configured: boolean;
-  authenticated: boolean;
-}
-
-export async function fetchAdminSession(): Promise<AdminSessionDto> {
-  const response = await fetch("/api/admin/auth/session", {
-    cache: "no-store",
-  });
-  return parseResponse<AdminSessionDto>(response);
-}
-
-export async function adminLogin(password: string): Promise<void> {
-  const response = await fetch("/api/admin/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
-  });
-  await parseResponse<{ success: boolean }>(response);
-}
-
-export async function adminLogout(): Promise<void> {
-  const response = await fetch("/api/admin/auth/logout", { method: "POST" });
-  await parseResponse<{ success: boolean }>(response);
-}
-
 export async function fetchAdminUsers(): Promise<UserDto[]> {
   const response = await fetch("/api/admin/users", { cache: "no-store" });
   return parseResponse<UserDto[]>(response);

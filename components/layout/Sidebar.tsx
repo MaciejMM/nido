@@ -7,14 +7,24 @@ import { usePathname } from "next/navigation";
 import { pl } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const links = [
+const baseLinks = [
   { href: "/", label: pl.nav.dashboard, icon: HomeIcon },
   { href: "/entries", label: pl.nav.entries, icon: CalendarDaysIcon },
-  { href: "/admin", label: pl.nav.admin, icon: SettingsIcon },
-];
+] as const;
 
-export function Sidebar() {
+const adminLink = {
+  href: "/admin",
+  label: pl.nav.admin,
+  icon: SettingsIcon,
+} as const;
+
+interface SidebarProps {
+  showAdmin?: boolean;
+}
+
+export function Sidebar({ showAdmin = false }: SidebarProps) {
   const pathname = usePathname();
+  const links = showAdmin ? [...baseLinks, adminLink] : baseLinks;
 
   return (
     <aside className="hidden w-56 shrink-0 border-r border-border bg-card/50 md:flex md:flex-col">

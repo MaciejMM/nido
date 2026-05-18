@@ -23,11 +23,13 @@ export function YearSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="outline" size="sm" className="gap-1">
-          {year}
-          <ChevronDownIcon className="size-4 opacity-60" />
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="sm" className="gap-1" />
+        }
+      >
+        {year}
+        <ChevronDownIcon className="size-4 opacity-60" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {availableYears.map((option) => (

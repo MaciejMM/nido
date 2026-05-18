@@ -1,5 +1,4 @@
-"use client";
-
+import { AuthActions } from "@/components/auth/AuthActions";
 import { YearSwitcher } from "@/components/filters/YearSwitcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { pl } from "@/lib/i18n";
@@ -16,6 +15,7 @@ export function Header() {
         </p>
       </div>
       <div className="flex items-center gap-2">
+        <AuthActions />
         <ThemeToggle />
         <YearSwitcher />
       </div>

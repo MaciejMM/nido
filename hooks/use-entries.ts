@@ -24,18 +24,24 @@ export function useEntries(ownerId?: string) {
   const [error, setError] = useState<string | null>(null);
   const entriesRef = useRef(entries);
   const prevYearRef = useRef(year);
+  const prevOwnerKeyRef = useRef<string | undefined>(undefined);
 
   entriesRef.current = entries;
 
+  const ownerKey = ownerId ?? "__all__";
+
   const load = useCallback(async () => {
     const yearChanged = prevYearRef.current !== year;
+    const ownerChanged = prevOwnerKeyRef.current !== ownerKey;
     prevYearRef.current = year;
+    prevOwnerKeyRef.current = ownerKey;
 
-    if (yearChanged) {
+    if (yearChanged || ownerChanged) {
       setEntries([]);
     }
 
-    const showSkeleton = yearChanged || entriesRef.current.length === 0;
+    const showSkeleton =
+      yearChanged || ownerChanged || entriesRef.current.length === 0;
     if (showSkeleton) {
       setLoading(true);
       setRefreshing(false);
@@ -54,7 +60,7 @@ export function useEntries(ownerId?: string) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [ownerId, year]);
+  }, [ownerId, ownerKey, year]);
 
   useEffect(() => {
     void load();

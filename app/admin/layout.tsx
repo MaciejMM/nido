@@ -1,21 +1,22 @@
-import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { redirect } from "next/navigation";
+
+import { AdminForbidden } from "@/components/admin/AdminForbidden";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { isAdminAuthenticated, isAdminConfigured } from "@/lib/auth/admin";
+import { hasAdminRole } from "@/lib/auth/kinde-admin";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const configured = isAdminConfigured();
-  const authenticated = configured ? await isAdminAuthenticated() : false;
+  const { isAuthenticated } = getKindeServerSession();
+  if (!(await isAuthenticated())) {
+    redirect("/api/auth/login");
+  }
 
-  if (!authenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-        <AdminLoginForm configured={configured} />
-      </div>
-    );
+  if (!(await hasAdminRole())) {
+    return <AdminForbidden />;
   }
 
   return <AdminShell>{children}</AdminShell>;

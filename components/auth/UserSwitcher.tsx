@@ -25,11 +25,13 @@ export function UserSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="outline" size="sm" className="gap-1">
-          {activeUser.name}
-          <ChevronDownIcon className="size-4 opacity-60" />
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="sm" className="gap-1" />
+        }
+      >
+        {activeUser.name}
+        <ChevronDownIcon className="size-4 opacity-60" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {users.map((user) => (

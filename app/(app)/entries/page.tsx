@@ -32,7 +32,7 @@ export default function EntriesPage() {
   const [deleteTarget, setDeleteTarget] = useState<CustodyEntryDto | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const { users, activeUserId } = useCurrentUser();
+  const { users, activeUserId, loading: usersLoading } = useCurrentUser();
   const { refresh: refreshStats } = useStats();
 
   const ownerId = useMemo(() => {
@@ -96,7 +96,12 @@ export default function EntriesPage() {
         </Button>
       </div>
 
-      <EntryFilters value={filter} onChange={setFilter} users={users} />
+      <EntryFilters
+        value={filter}
+        onChange={setFilter}
+        users={users}
+        usersLoading={usersLoading}
+      />
 
       <EntryList
         entries={entries}

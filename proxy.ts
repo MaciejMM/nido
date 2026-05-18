@@ -1,25 +1,48 @@
+import { withAuth } from "@kinde-oss/kinde-auth-nextjs/middleware";
+import type { KindeAccessToken } from "@kinde-oss/kinde-auth-nextjs/types";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { ADMIN_SESSION_COOKIE } from "@/lib/auth/admin-constants";
+import { hasAdminRoleInToken } from "@/lib/auth/kinde-admin";
 
-export function proxy(request: NextRequest) {
+type KindeAuthRequest = NextRequest & {
+  kindeAuth?: {
+    token: KindeAccessToken;
+  };
+};
+
+function guardAdminApi(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl;
 
-  if (
-    pathname.startsWith("/api/admin") &&
-    !pathname.startsWith("/api/admin/auth")
-  ) {
-    const expected = process.env.ADMIN_SESSION_TOKEN?.trim();
-    const session = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-
-    if (!expected || session !== expected) {
-      return NextResponse.json({ error: "Brak autoryzacji" }, { status: 401 });
-    }
+  if (!pathname.startsWith("/api/admin")) {
+    return null;
   }
 
-  return NextResponse.next();
+  const token = (request as KindeAuthRequest).kindeAuth?.token;
+  if (!token || !hasAdminRoleInToken(token)) {
+    return NextResponse.json({ error: "Brak autoryzacji" }, { status: 403 });
+  }
+
+  return null;
 }
 
+export default withAuth(
+  async function proxy(request: NextRequest) {
+    const adminResponse = guardAdminApi(request);
+    if (adminResponse) {
+      return adminResponse;
+    }
+
+    return NextResponse.next();
+  },
+  {
+    loginPage: "/api/auth/login",
+    isReturnToCurrentPage: true,
+    publicPaths: ["/api/auth"],
+  },
+);
+
 export const config = {
-  matcher: ["/api/admin/:path*"],
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+  ],
 };

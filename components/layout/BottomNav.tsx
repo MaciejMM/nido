@@ -1,19 +1,30 @@
 "use client";
 
-import { CalendarDaysIcon, HomeIcon } from "lucide-react";
+import { CalendarDaysIcon, HomeIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { pl } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
-const links = [
+const baseLinks = [
   { href: "/", label: pl.nav.home, icon: HomeIcon },
   { href: "/entries", label: pl.nav.entries, icon: CalendarDaysIcon },
-];
+] as const;
 
-export function BottomNav() {
+const adminLink = {
+  href: "/admin",
+  label: pl.nav.admin,
+  icon: SettingsIcon,
+} as const;
+
+interface BottomNavProps {
+  showAdmin?: boolean;
+}
+
+export function BottomNav({ showAdmin = false }: BottomNavProps) {
   const pathname = usePathname();
+  const links = showAdmin ? [...baseLinks, adminLink] : baseLinks;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 md:hidden">

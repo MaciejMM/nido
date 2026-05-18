@@ -19,6 +19,51 @@ interface EntryListProps {
   onDelete: (entry: CustodyEntryDto) => void;
 }
 
+function EntryCardSkeleton() {
+  return (
+    <Card className="rounded-xl">
+      <CardContent className="flex items-start justify-between gap-3 p-4">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-5 w-14 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-28" />
+        </div>
+        <div className="flex shrink-0 gap-1">
+          <Skeleton className="size-9 rounded-md" />
+          <Skeleton className="size-9 rounded-md" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function EntryEmptySkeleton() {
+  return (
+    <Card className="rounded-xl border-dashed">
+      <CardContent className="space-y-2 py-12 text-center">
+        <Skeleton className="mx-auto h-4 w-40" />
+        <Skeleton className="mx-auto h-4 w-56" />
+      </CardContent>
+    </Card>
+  );
+}
+
+function EntryListSkeleton({ empty = false }: { empty?: boolean }) {
+  if (empty) {
+    return <EntryEmptySkeleton />;
+  }
+
+  return (
+    <div className="space-y-3" aria-busy>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <EntryCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
+
 export function EntryList({
   entries,
   loading,
@@ -27,33 +72,23 @@ export function EntryList({
   onDelete,
 }: EntryListProps) {
   if (loading) {
-    return (
-      <div className="space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl" />
-        ))}
-      </div>
-    );
+    return <EntryListSkeleton />;
+  }
+
+  if (refreshing && entries.length === 0) {
+    return <EntryListSkeleton empty />;
   }
 
   if (entries.length === 0) {
     return (
-      <div
-        className={cn(
-          "transition-opacity duration-150",
-          refreshing && "pointer-events-none opacity-60",
-        )}
-        aria-busy={refreshing}
-      >
-        <Card className="rounded-xl border-dashed">
-          <CardContent className="py-12 text-center">
-            <p className="text-sm font-medium">{pl.entries.empty}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {pl.entries.emptyHint}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="rounded-xl border-dashed">
+        <CardContent className="py-12 text-center">
+          <p className="text-sm font-medium">{pl.entries.empty}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {pl.entries.emptyHint}
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 

@@ -14,6 +14,11 @@ export const pl = {
     entries: "Dni",
     admin: "Administracja",
   },
+  auth: {
+    signIn: "Zaloguj się",
+    signOut: "Wyloguj",
+    signedInUser: "Zalogowany użytkownik",
+  },
   admin: {
     title: "Administracja",
     loginTitle: "Logowanie administratora",
@@ -23,7 +28,9 @@ export const pl = {
     loggingIn: "Logowanie…",
     logout: "Wyloguj",
     notConfigured:
-      "Panel admina nie jest skonfigurowany. Ustaw zmienną ADMIN_PASSWORD w pliku .env.local.",
+      "Panel admina nie jest skonfigurowany. Ustaw zmienne ADMIN_PASSWORD i ADMIN_SESSION_TOKEN (lokalnie w .env.local, na Vercel w Settings → Environment Variables). Po zmianie zmiennych wykonaj ponowny deploy.",
+    notConfiguredMissing: (vars: string) =>
+      `Brakujące zmienne: ${vars}.`,
     invalidPassword: "Nieprawidłowe hasło",
     loginFailed: "Logowanie nie powiodło się",
     overview: "Przegląd",
@@ -31,6 +38,9 @@ export const pl = {
     years: "Lata",
     entries: "Wpisy",
     backToApp: "Wróć do aplikacji",
+    forbiddenTitle: "Brak dostępu",
+    forbiddenSubtitle:
+      "Nie masz uprawnień administratora. Skontaktuj się z administratorem, jeśli uważasz, że to błąd.",
     overviewSubtitle: "Zarządzaj użytkownikami, latami i wpisami opieki",
     usersSubtitle: "Dodawaj i edytuj konta rodziców",
     yearsSubtitle: "Dodawaj lata dostępne w przełączniku aplikacji",

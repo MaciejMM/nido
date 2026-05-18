@@ -48,6 +48,24 @@ pnpm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Vercel (panel `/admin`)
+
+Panel administratora wymaga **obu** zmiennych środowiskowych:
+
+| Zmienna | Opis |
+|---------|------|
+| `ADMIN_PASSWORD` | Hasło logowania do `/admin` |
+| `ADMIN_SESSION_TOKEN` | Losowy ciąg min. 32 znaków (wartość cookie sesji po zalogowaniu) |
+| `MONGODB_URI` | Connection string do MongoDB Atlas |
+
+W Vercel: **Project → Settings → Environment Variables** — ustaw je dla środowiska **Production** (i Preview, jeśli testujesz preview deploy). Po dodaniu lub zmianie zmiennych uruchom **Redeploy** (nowe wartości nie trafiają do już działającego buildu).
+
+Wygenerowanie tokenu sesji (lokalnie):
+
+```bash
+openssl rand -base64 32
+```
+
 ## Scripts
 
 | Script | Description |

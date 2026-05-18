@@ -4,14 +4,11 @@ import {
   CalendarDaysIcon,
   CalendarRangeIcon,
   LayoutDashboardIcon,
-  LogOutIcon,
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { adminLogout } from "@/lib/admin-api-client";
 import { pl } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -24,12 +21,6 @@ const links = [
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await adminLogout();
-    router.refresh();
-  };
 
   return (
     <div className="flex min-h-screen">
@@ -62,36 +53,25 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="space-y-2 border-t border-border p-3">
+        <div className="border-t border-border p-3">
           <Link
             href="/"
             className="block rounded-xl px-3 py-2 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground"
           >
             {pl.admin.backToApp}
           </Link>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start gap-2"
-            onClick={() => void handleLogout()}
-          >
-            <LogOutIcon className="size-4" />
-            {pl.admin.logout}
-          </Button>
         </div>
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-border px-4 py-3 md:px-6">
           <p className="text-sm font-medium md:hidden">{pl.admin.title}</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="md:ml-auto"
-            onClick={() => void handleLogout()}
+          <Link
+            href="/"
+            className="ml-auto text-sm text-muted-foreground hover:text-foreground md:hidden"
           >
-            {pl.admin.logout}
-          </Button>
+            {pl.admin.backToApp}
+          </Link>
         </header>
         <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 md:px-6">
           {children}
