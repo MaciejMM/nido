@@ -1,19 +1,86 @@
-import {
-  differenceInCalendarDays,
-  eachDayOfInterval,
-  format,
-  getDay,
-} from "date-fns";
+import { eachDayOfInterval, format, parseISO } from "date-fns";
 
+const CALENDAR_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Calendar date (YYYY-MM-DD) from a local calendar picker value. */
+export function toCalendarDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** UTC midnight for a calendar date (YYYY-MM-DD). */
+export function parseCalendarDate(value: string): Date {
+  if (!CALENDAR_DATE_PATTERN.test(value)) {
+    throw new Error(`Invalid calendar date: ${value}`);
+  }
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d));
+}
+
+/** Normalize any Date to UTC midnight of its UTC calendar day. */
 export function normalizeToUtcMidnight(date: Date): Date {
   return new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
 }
 
-/** Saturday (6) or Sunday (0) in local time. */
+/**
+ * Recover the intended calendar date from a stored Date.
+ * Handles legacy entries saved via toISOString() of local-midnight picker values.
+ */
+export function toStoredCalendarDate(date: Date): Date {
+  const hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+  const seconds = date.getUTCSeconds();
+  const ms = date.getUTCMilliseconds();
+
+  if (hours === 0 && minutes === 0 && seconds === 0 && ms === 0) {
+    return normalizeToUtcMidnight(date);
+  }
+
+  const y = date.getUTCFullYear();
+  const m = date.getUTCMonth();
+  const d = date.getUTCDate();
+  if (hours >= 12) {
+    return new Date(Date.UTC(y, m, d + 1));
+  }
+  return new Date(Date.UTC(y, m, d));
+}
+
+/** Local-midnight Date for react-day-picker from a stored/API ISO string. */
+export function calendarDateToPickerDate(iso: string): Date {
+  const stored = toStoredCalendarDate(parseISO(iso));
+  return new Date(
+    stored.getUTCFullYear(),
+    stored.getUTCMonth(),
+    stored.getUTCDate(),
+  );
+}
+
+export function coerceCalendarDate(value: unknown): Date {
+  if (typeof value === "string") {
+    if (CALENDAR_DATE_PATTERN.test(value)) {
+      return parseCalendarDate(value);
+    }
+    return toStoredCalendarDate(new Date(value));
+  }
+  if (value instanceof Date) {
+    return toStoredCalendarDate(value);
+  }
+  throw new Error("Invalid date");
+}
+
+/** Saturday (6) or Sunday (0) — use with UTC-normalized calendar dates. */
 export function isWeekend(date: Date): boolean {
-  const weekday = getDay(date);
+  const weekday = date.getUTCDay();
+  return weekday === 0 || weekday === 6;
+}
+
+/** Weekend check for react-day-picker values (local calendar cells). */
+export function isWeekendLocal(date: Date): boolean {
+  const weekday = date.getDay();
   return weekday === 0 || weekday === 6;
 }
 
@@ -25,9 +92,19 @@ export function eachDayInclusive(start: Date, end: Date): Date[] {
   }).filter((day) => !isWeekend(day));
 }
 
-/** Weekdays only (Fri–Mon inclusive → 2 days). */
+/** Weekdays only — for UTC-normalized stored dates. */
 export function countInclusiveDays(start: Date, end: Date): number {
-  return eachDayInclusive(start, end).length;
+  return eachDayInclusive(
+    normalizeToUtcMidnight(start),
+    normalizeToUtcMidnight(end),
+  ).length;
+}
+
+/** Weekdays only — for local-midnight react-day-picker values. */
+export function countInclusiveDaysFromPicker(start: Date, end: Date): number {
+  const startCal = parseCalendarDate(toCalendarDateString(start));
+  const endCal = parseCalendarDate(toCalendarDateString(end));
+  return eachDayInclusive(startCal, endCal).length;
 }
 
 export function rangesOverlap(

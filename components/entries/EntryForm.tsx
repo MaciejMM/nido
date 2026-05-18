@@ -38,7 +38,10 @@ import type {
   UpdateEntryInput,
   UserDto,
 } from "@/types";
-import { countInclusiveDays } from "@/utils/dates";
+import {
+  calendarDateToPickerDate,
+  countInclusiveDaysFromPicker,
+} from "@/utils/dates";
 
 interface EntryFormProps {
   open: boolean;
@@ -136,8 +139,8 @@ export function EntryForm({
     if (!open) return;
 
     if (entry) {
-      setStartDate(new Date(entry.startDate));
-      setEndDate(new Date(entry.endDate));
+      setStartDate(calendarDateToPickerDate(entry.startDate));
+      setEndDate(calendarDateToPickerDate(entry.endDate));
       setOwnerId(entry.owner?.id ?? entry.ownerId);
       setNotes(entry.notes ?? "");
     } else {
@@ -159,7 +162,7 @@ export function EntryForm({
       return;
     }
 
-    if (countInclusiveDays(startDate, endDate) === 0) {
+    if (countInclusiveDaysFromPicker(startDate, endDate) === 0) {
       toast.error(pl.entries.noWeekdaysInRange);
       return;
     }

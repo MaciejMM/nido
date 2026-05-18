@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { pl } from "@/lib/i18n";
 import { calendarLocale, dateLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
-import { countInclusiveDays, isWeekend } from "@/utils/dates";
+import { countInclusiveDaysFromPicker, isWeekendLocal } from "@/utils/dates";
 
 interface DateRangePickerFieldProps {
   startDate?: Date;
@@ -34,7 +34,7 @@ export function DateRangePickerField({
 
   const weekdayCount =
     startDate && endDate && endDate >= startDate
-      ? countInclusiveDays(startDate, endDate)
+      ? countInclusiveDaysFromPicker(startDate, endDate)
       : null;
 
   return (
@@ -73,7 +73,7 @@ export function DateRangePickerField({
         locale={calendarLocale}
         numberOfMonths={1}
         defaultMonth={startDate ?? endDate}
-        modifiers={{ weekend: isWeekend }}
+        modifiers={{ weekend: isWeekendLocal }}
         modifiersClassNames={{
           weekend: "opacity-50",
         }}

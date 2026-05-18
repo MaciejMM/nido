@@ -1,10 +1,11 @@
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 
 import { dateLocale } from "@/lib/locale";
+import { calendarDateToPickerDate } from "@/utils/dates";
 
 export function formatDateRange(start: string, end: string): string {
-  const startDate = parseISO(start);
-  const endDate = parseISO(end);
+  const startDate = calendarDateToPickerDate(start);
+  const endDate = calendarDateToPickerDate(end);
   return `${format(startDate, "d MMM yyyy", { locale: dateLocale })} – ${format(endDate, "d MMM yyyy", { locale: dateLocale })}`;
 }
 

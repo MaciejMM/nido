@@ -7,6 +7,7 @@ import type {
   UserDto,
 } from "@/types";
 import { pl } from "@/lib/i18n";
+import { toCalendarDateString } from "@/utils/dates";
 
 async function parseResponse<T>(response: Response): Promise<T> {
   const data = await response.json();
@@ -46,8 +47,8 @@ export async function createEntry(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ...input,
-      startDate: input.startDate.toISOString(),
-      endDate: input.endDate.toISOString(),
+      startDate: toCalendarDateString(input.startDate),
+      endDate: toCalendarDateString(input.endDate),
     }),
   });
   return parseResponse<CustodyEntryDto>(response);
@@ -62,8 +63,10 @@ export async function updateEntry(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ...input,
-      ...(input.startDate ? { startDate: input.startDate.toISOString() } : {}),
-      ...(input.endDate ? { endDate: input.endDate.toISOString() } : {}),
+      ...(input.startDate
+        ? { startDate: toCalendarDateString(input.startDate) }
+        : {}),
+      ...(input.endDate ? { endDate: toCalendarDateString(input.endDate) } : {}),
     }),
   });
   return parseResponse<CustodyEntryDto>(response);

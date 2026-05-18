@@ -1,9 +1,16 @@
 import { z } from "zod";
 
+import { coerceCalendarDate } from "@/utils/dates";
+
+const calendarDateSchema = z.preprocess(
+  (value) => coerceCalendarDate(value),
+  z.date(),
+);
+
 export const createEntrySchema = z
   .object({
-    startDate: z.coerce.date(),
-    endDate: z.coerce.date(),
+    startDate: calendarDateSchema,
+    endDate: calendarDateSchema,
     ownerId: z.string().min(1),
     notes: z.string().optional(),
   })
@@ -14,8 +21,8 @@ export const createEntrySchema = z
 
 export const updateEntrySchema = z
   .object({
-    startDate: z.coerce.date().optional(),
-    endDate: z.coerce.date().optional(),
+    startDate: calendarDateSchema.optional(),
+    endDate: calendarDateSchema.optional(),
     ownerId: z.string().min(1).optional(),
     notes: z.string().optional(),
   })

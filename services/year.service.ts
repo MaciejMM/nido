@@ -2,7 +2,7 @@ import { createYearSchema, type CreateYearInput } from "@/lib/validators/year";
 import { CustodyEntry } from "@/models/CustodyEntry";
 import { TrackingYear, type ITrackingYear } from "@/models/TrackingYear";
 import type { TrackingYearDto } from "@/types";
-import { overlapsYear } from "@/utils/dates";
+import { overlapsYear, toStoredCalendarDate } from "@/utils/dates";
 import { ConflictError, NotFoundError, ValidationError } from "@/utils/errors";
 
 function toYearDto(year: ITrackingYear): TrackingYearDto {
@@ -18,8 +18,8 @@ function collectYearsFromEntries(
   const years = new Set<number>();
 
   for (const entry of entries) {
-    const startYear = entry.startDate.getUTCFullYear();
-    const endYear = entry.endDate.getUTCFullYear();
+    const startYear = toStoredCalendarDate(entry.startDate).getUTCFullYear();
+    const endYear = toStoredCalendarDate(entry.endDate).getUTCFullYear();
     for (let year = startYear; year <= endYear; year += 1) {
       years.add(year);
     }

@@ -16,6 +16,7 @@ import {
   countDaysInYear,
   countInclusiveDays,
   overlapsYear,
+  toStoredCalendarDate,
 } from "@/utils/dates";
 import { pl } from "@/lib/i18n";
 import { ConflictError, NotFoundError, ValidationError } from "@/utils/errors";
@@ -40,14 +41,16 @@ function toEntryDto(
   owner?: IUser,
   year?: number,
 ): CustodyEntryDto {
+  const startDate = toStoredCalendarDate(entry.startDate);
+  const endDate = toStoredCalendarDate(entry.endDate);
   const days = year
-    ? countDaysInYear(entry.startDate, entry.endDate, year)
-    : countInclusiveDays(entry.startDate, entry.endDate);
+    ? countDaysInYear(startDate, endDate, year)
+    : countInclusiveDays(startDate, endDate);
 
   return {
     id: entry._id.toString(),
-    startDate: entry.startDate.toISOString(),
-    endDate: entry.endDate.toISOString(),
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
     ownerId: resolveOwnerId(entry.ownerId, owner),
     owner: owner
       ? {
