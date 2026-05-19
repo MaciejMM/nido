@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AppProviders } from "@/components/providers/app-providers";
@@ -36,6 +37,7 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans">
         <AppProviders>{children}</AppProviders>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
