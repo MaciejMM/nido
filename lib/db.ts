@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 
+// Register all schemas before populate/ref lookups (order: User before CustodyEntry).
+import "@/models/User";
+import "@/models/CustodyEntry";
+import "@/models/TrackingYear";
+
 function resolveMongoUri(): string {
   const uri = process.env.MONGODB_URI?.trim();
   if (uri) return uri;
