@@ -10,9 +10,6 @@ export function Header() {
         <h1 className="text-lg font-semibold tracking-tight md:hidden">
           {pl.app.name}
         </h1>
-        <p className="hidden text-sm text-muted-foreground md:block">
-          {pl.app.tagline}
-        </p>
       </div>
       <div className="flex items-center gap-2">
         <AuthActions />

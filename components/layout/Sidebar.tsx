@@ -30,7 +30,6 @@ export function Sidebar({ showAdmin = false }: SidebarProps) {
     <aside className="hidden w-56 shrink-0 border-r border-border bg-card/50 md:flex md:flex-col">
       <div className="px-4 py-6">
         <p className="text-lg font-semibold tracking-tight">{pl.app.name}</p>
-        <p className="text-xs text-muted-foreground">{pl.app.tagline}</p>
       </div>
       <nav className="flex flex-1 flex-col gap-1 px-3">
         {links.map(({ href, label, icon: Icon }) => {

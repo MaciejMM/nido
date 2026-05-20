@@ -4,7 +4,6 @@ import type { UserDto } from "@/types";
 export const pl = {
   app: {
     name: "Nido",
-    tagline: "Dwa domy, jedno gniazdo",
     description:
       "Wspólne gniazdo na dwa domy — harmonogram opieki, finanse i codzienność rodziny",
   },
