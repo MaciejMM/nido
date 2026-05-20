@@ -1,4 +1,4 @@
-import { eachDayOfInterval, format, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const CALENDAR_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -84,12 +84,26 @@ export function isWeekendLocal(date: Date): boolean {
   return weekday === 0 || weekday === 6;
 }
 
-/** All calendar days in [start, end], excluding weekends. */
+/** All UTC calendar weekdays in [start, end] (inclusive). */
 export function eachDayInclusive(start: Date, end: Date): Date[] {
-  return eachDayOfInterval({
-    start: normalizeToUtcMidnight(start),
-    end: normalizeToUtcMidnight(end),
-  }).filter((day) => !isWeekend(day));
+  const days: Date[] = [];
+  let cursor = normalizeToUtcMidnight(start);
+  const endNorm = normalizeToUtcMidnight(end);
+
+  while (cursor.getTime() <= endNorm.getTime()) {
+    if (!isWeekend(cursor)) {
+      days.push(cursor);
+    }
+    cursor = new Date(
+      Date.UTC(
+        cursor.getUTCFullYear(),
+        cursor.getUTCMonth(),
+        cursor.getUTCDate() + 1,
+      ),
+    );
+  }
+
+  return days;
 }
 
 /** Weekdays only — for UTC-normalized stored dates. */

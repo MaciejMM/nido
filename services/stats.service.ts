@@ -7,6 +7,7 @@ import {
   eachDayInYear,
   overlapsYear,
   toMonthKey,
+  toStoredCalendarDate,
 } from "@/utils/dates";
 
 export async function getStats(filters: StatsFilters = {}): Promise<StatsDto> {
@@ -23,7 +24,10 @@ export async function getStats(filters: StatsFilters = {}): Promise<StatsDto> {
   const monthlyMap = new Map<string, { parentA: number; parentB: number }>();
 
   for (const entry of entries) {
-    if (!overlapsYear(entry.startDate, entry.endDate, year)) {
+    const startDate = toStoredCalendarDate(entry.startDate);
+    const endDate = toStoredCalendarDate(entry.endDate);
+
+    if (!overlapsYear(startDate, endDate, year)) {
       continue;
     }
 
@@ -34,7 +38,7 @@ export async function getStats(filters: StatsFilters = {}): Promise<StatsDto> {
 
     if (!owner) continue;
 
-    const days = countDaysInYear(entry.startDate, entry.endDate, year);
+    const days = countDaysInYear(startDate, endDate, year);
 
     if (owner.role === "parentA") {
       totalDaysParentA += days;
@@ -42,7 +46,7 @@ export async function getStats(filters: StatsFilters = {}): Promise<StatsDto> {
       totalDaysParentB += days;
     }
 
-    for (const day of eachDayInYear(entry.startDate, entry.endDate, year)) {
+    for (const day of eachDayInYear(startDate, endDate, year)) {
       const monthKey = toMonthKey(day);
       const current = monthlyMap.get(monthKey) ?? { parentA: 0, parentB: 0 };
 

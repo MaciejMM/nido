@@ -17,6 +17,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { StatsDto, UserDto } from "@/types";
 
+/** Matches Tailwind `h-72` (18rem) so Recharts gets a positive height before layout. */
+const CHART_HEIGHT = 288;
+
 interface StatsChartProps {
   stats: StatsDto | null;
   loading: boolean;
@@ -36,7 +39,7 @@ export function StatsChart({ stats, loading, users }: StatsChartProps) {
       <CardHeader>
         <CardTitle className="text-base font-semibold">{pl.dashboard.monthlyBreakdown}</CardTitle>
       </CardHeader>
-      <CardContent className="h-72">
+      <CardContent className="h-72 min-h-72">
         {loading && <Skeleton className="h-full w-full rounded-lg" />}
 
         {!loading && data.length === 0 && (
@@ -46,7 +49,8 @@ export function StatsChart({ stats, loading, users }: StatsChartProps) {
         )}
 
         {!loading && data.length > 0 && (
-          <ResponsiveContainer width="100%" height="100%">
+          <div className="w-full min-w-0" style={{ height: CHART_HEIGHT }}>
+            <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={0}>
             <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
@@ -66,7 +70,8 @@ export function StatsChart({ stats, loading, users }: StatsChartProps) {
                 radius={4}
               />
             </BarChart>
-          </ResponsiveContainer>
+            </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
