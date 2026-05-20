@@ -2,8 +2,6 @@
 
 Mobile-first app for co-parenting families in two homes — custody scheduling today, shared finances and more planned. Built with Next.js, MongoDB, and ShadCN UI.
 
-**Tagline:** *Dwa domy, jedno gniazdo*
-
 ## Requirements
 
 - Node.js 20+
