@@ -53,7 +53,9 @@ export function RecentEntries({ entries, loading }: RecentEntriesProps) {
                   {entry.owner?.name ?? pl.entries.unknownParent}
                 </p>
               </div>
-              <Badge variant="secondary">{entry.days}{pl.daysShort}</Badge>
+              <Badge variant="secondary">
+                {pl.entries.weekdaysBadge(entry.days)}
+              </Badge>
             </div>
           ))}
       </CardContent>

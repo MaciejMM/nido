@@ -108,7 +108,9 @@ export function EntryList({
                 <p className="text-sm font-medium">
                   {formatDateRange(entry.startDate, entry.endDate)}
                 </p>
-                <Badge variant="secondary">{entry.days} {pl.days}</Badge>
+                <Badge variant="secondary">
+                  {pl.entries.weekdaysBadge(entry.days)}
+                </Badge>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
                 {entry.owner?.name ?? pl.entries.unknownParent}

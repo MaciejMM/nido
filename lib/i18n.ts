@@ -130,6 +130,8 @@ export const pl = {
     pickDateRange: "Wybierz zakres dat w kalendarzu",
     weekdaysCount: (count: number) =>
       count === 1 ? "1 dzień roboczy" : `${count} dni roboczych`,
+    weekdaysBadge: (count: number) =>
+      count === 1 ? "1 dzień rob." : `${count} dni rob.`,
     weekendsExcluded: "bez weekendów",
     noWeekdaysInRange: "Wybrany okres nie zawiera dni roboczych",
     parent: "Rodzic",
