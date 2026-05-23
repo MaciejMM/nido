@@ -272,6 +272,7 @@ export const pl = {
       monthly: "Wydatki miesięczne",
       byCategory: "Według kategorii",
       categoryLimits: "Wykorzystanie limitów",
+      totalAvailable: "Łącznie dostępne",
       trend: "Trend (6 mies.)",
       daily: "Wydatki dzienne",
       noData: "Brak danych do wykresu",
