@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 
 import { connectMongo } from "../lib/db";
+import { seedDefaultCategories } from "../services/finance/category.service";
 import { CustodyEntry } from "../models/CustodyEntry";
+import { ExpenseCategory } from "../models/ExpenseCategory";
 import { User } from "../models/User";
 
 async function seed() {
@@ -9,6 +11,7 @@ async function seed() {
 
   await User.deleteMany({});
   await CustodyEntry.deleteMany({});
+  await ExpenseCategory.deleteMany({});
 
   const parentA = await User.create({
     name: "Anna",
@@ -57,6 +60,9 @@ async function seed() {
       ownerId: parentB._id,
     },
   ]);
+
+  await seedDefaultCategories();
+  console.log("Finance categories seeded");
 
   console.log("Seed complete");
   console.log("Parent A:", parentA._id.toString(), parentA.name);

@@ -1,5 +1,5 @@
-import { EntriesView } from "@/components/entries/EntriesView";
+import { redirect } from "next/navigation";
 
-export default function EntriesPage() {
-  return <EntriesView />;
+export default function EntriesRedirectPage() {
+  redirect("/care");
 }

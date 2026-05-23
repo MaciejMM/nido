@@ -1,5 +1,5 @@
-import { DashboardView } from "@/components/dashboard/DashboardView";
+import { HomeView } from "@/components/home/HomeView";
 
-export default function DashboardPage() {
-  return <DashboardView />;
+export default function HomePage() {
+  return <HomeView />;
 }

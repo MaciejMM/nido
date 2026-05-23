@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { EntryFilters } from "@/components/entries/EntryFilters";
 import { EntryForm } from "@/components/entries/EntryForm";
 import { EntryList } from "@/components/entries/EntryList";
+import { FloatingAddEntryButton } from "@/components/entries/FloatingAddEntryButton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +26,12 @@ import type {
   UpdateEntryInput,
 } from "@/types";
 
-export function EntriesView() {
+interface EntriesViewProps {
+  /** Hide page title when embedded in the care section */
+  embedded?: boolean;
+}
+
+export function EntriesView({ embedded = false }: EntriesViewProps) {
   const [filter, setFilter] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<CustodyEntryDto | null>(null);
@@ -79,22 +85,12 @@ export function EntriesView() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      {!embedded && (
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">{pl.entries.title}</h2>
-          <p className="text-sm text-muted-foreground">
-            {pl.entries.subtitle}
-          </p>
+          <p className="text-sm text-muted-foreground">{pl.entries.subtitle}</p>
         </div>
-        <Button
-          onClick={() => {
-            setEditingEntry(null);
-            setFormOpen(true);
-          }}
-        >
-          {pl.entries.add}
-        </Button>
-      </div>
+      )}
 
       <EntryFilters
         value={filter}
@@ -124,6 +120,13 @@ export function EntriesView() {
         defaultOwnerId={activeUserId}
         entry={editingEntry}
         onSubmit={handleSubmit}
+      />
+
+      <FloatingAddEntryButton
+        onClick={() => {
+          setEditingEntry(null);
+          setFormOpen(true);
+        }}
       />
 
       <Dialog

@@ -10,7 +10,9 @@ export const pl = {
   nav: {
     dashboard: "Panel",
     home: "Start",
+    care: "Opieka",
     entries: "Dni",
+    finance: "Finanse",
     admin: "Administracja",
   },
   auth: {
@@ -93,6 +95,19 @@ export const pl = {
   combined: "Razem",
   days: "dni",
   daysShort: "d",
+  home: {
+    title: "Start",
+    subtitle: "Podgląd opieki i budżetu — dotknij karty, aby przejść do szczegółów",
+    careSection: "Opieka",
+    financeSection: "Finanse",
+  },
+  care: {
+    title: "Opieka",
+    subtitle: "Harmonogram i dni opieki obu rodziców",
+    subtitleForYear: (year: number) =>
+      `Podsumowanie opieki w ${year} roku (bez weekendów)`,
+    daysSection: "Dni",
+  },
   dashboard: {
     title: "Panel",
     subtitle: "Przegląd dni opieki obu rodziców",
@@ -146,6 +161,173 @@ export const pl = {
   },
   year: {
     label: "Rok",
+  },
+  finance: {
+    nav: {
+      dashboard: "Panel",
+      expenses: "Wydatki",
+      analytics: "Analityka",
+      more: "Więcej",
+      categories: "Kategorie",
+      settings: "Ustawienia",
+      home: "Start",
+    },
+    dashboard: {
+      title: "Finanse",
+      subtitle: "Budżet gospodarstwa domowego",
+      spent: "Wydano",
+      remaining: "Pozostało",
+      limit: "Limit miesięczny",
+      dailyAllowance: "Średnio na pozostałe dni",
+      daysLeft: (n: number) =>
+        n === 1 ? "1 dzień do końca miesiąca" : `${n} dni do końca miesiąca`,
+      utilization: "Wykorzystanie budżetu",
+      noBudget: "Ustaw limit miesięczny w ustawieniach",
+      projectedOverspend: "Prognoza: przekroczenie budżetu",
+      addExpense: "Dodaj wydatek",
+    },
+    expenses: {
+      title: "Wydatki",
+      empty: "Brak wydatków w tym okresie",
+      emptyHint: "Dodaj pierwszy wydatek lub zmień filtry",
+      add: "Nowy wydatek",
+      edit: "Edytuj wydatek",
+      amount: "Kwota",
+      titleLabel: "Tytuł",
+      category: "Kategoria",
+      date: "Data",
+      notes: "Notatki (opcjonalnie)",
+      deleteTitle: "Usunąć wydatek?",
+      deleteDescription: "Ten wydatek zostanie trwale usunięty.",
+      created: "Wydatek dodany",
+      updated: "Wydatek zaktualizowany",
+      deleted: "Wydatek usunięty",
+      saving: "Zapisywanie…",
+      save: "Zapisz",
+      cancel: "Anuluj",
+      delete: "Usuń",
+      deleting: "Usuwanie…",
+      filterCategory: "Kategoria",
+      filterAll: "Wszystkie",
+      fillRequired: "Uzupełnij wymagane pola",
+    },
+    categories: {
+      title: "Kategorie",
+      add: "Dodaj kategorię",
+      name: "Nazwa",
+      icon: "Ikona",
+      color: "Kolor",
+      monthlyLimit: "Limit miesięczny (PLN)",
+      limitPlaceholder: "Opcjonalnie",
+      saveLimit: "Zapisz",
+      limitSaved: "Limit zapisany",
+      invalidLimit: "Podaj poprawną kwotę limitu",
+      noLimit: "Bez limitu",
+      limitsEmpty: "Ustaw limity kategorii, aby śledzić wykorzystanie",
+      limitsTitle: "Limity kategorii",
+      created: "Kategoria dodana",
+      deleted: "Kategoria usunięta",
+      empty: "Brak kategorii",
+      delete: "Usuń",
+      deleteAria: "Usuń kategorię",
+      deleteTitle: "Usunąć kategorię?",
+      deleteDescription: (name: string) =>
+        `Kategoria „${name}” zostanie trwale usunięta.`,
+      cancel: "Anuluj",
+      deleting: "Usuwanie…",
+    },
+    analytics: {
+      title: "Analityka",
+      monthly: "Wydatki miesięczne",
+      byCategory: "Według kategorii",
+      categoryLimits: "Wykorzystanie limitów",
+      trend: "Trend (6 mies.)",
+      daily: "Wydatki dzienne",
+      noData: "Brak danych do wykresu",
+    },
+    settings: {
+      title: "Ustawienia finansów",
+      budgetLimit: "Limit miesięczny (PLN)",
+      budgetSaved: "Limit zapisany",
+      categoriesSection: "Kategorie wydatków",
+      categoriesHint:
+        "Dodawaj kategorie, ikony, kolory i limity miesięczne dla wydatków.",
+      manageCategories: "Zarządzaj kategoriami",
+      categoriesCount: (n: number) =>
+        n === 1 ? "1 kategoria" : n < 5 ? `${n} kategorie` : `${n} kategorii`,
+      notifications: "Powiadomienia",
+      notificationsHint: "Przypomnienie o dodaniu dzisiejszych wydatków",
+      reminderHour: "Godzina przypomnienia",
+      timezone: "Strefa czasowa",
+      enablePush: "Włącz powiadomienia push",
+      disablePush: "Wyłącz powiadomienia push",
+      pushEnabled: "Powiadomienia włączone",
+      pushDisabled: "Powiadomienia wyłączone",
+      testPush: "Wyślij test",
+      testPushSent: (n: number) =>
+        n === 1 ? "Wysłano 1 powiadomienie testowe" : `Wysłano ${n} powiadomień testowych`,
+      saved: "Ustawienia zapisane",
+    },
+    ai: {
+      title: "Wskazówki AI",
+      paceTitle: "Tempo wydatków",
+      paceFaster: (pct: string) =>
+        `Wydajesz o ${pct} szybciej niż średnia z ostatnich miesięcy`,
+      paceSlower: (pct: string) =>
+        `Wydajesz o ${pct} wolniej niż średnia z ostatnich miesięcy`,
+      budgetTitle: "Budżet",
+      budgetExhausted: "Limit miesięczny został wykorzystany",
+      budgetDaysLeft: (days: number) =>
+        days === 1
+          ? "Przy obecnym tempie budżet skończy się za 1 dzień"
+          : `Przy obecnym tempie budżet skończy się za ${days} dni`,
+      budgetLastsMonth:
+        "Przy obecnym tempie budżet wystarczy do końca miesiąca",
+      topCategoryTitle: "Największa kategoria",
+      topCategory: (name: string, amount: string) =>
+        `${name} — ${amount} w tym miesiącu`,
+      todayTitle: "Dzisiaj",
+      todayHigh: (amount: string, limit: string) =>
+        `Dzisiejsze wydatki (${amount}) przekraczają dzienny limit (${limit})`,
+      todayOk: (amount: string) => `Dzisiejsze wydatki: ${amount}`,
+      projectionTitle: "Prognoza",
+      projectionOverspend:
+        "Przy obecnym tempie przekroczysz limit do końca miesiąca",
+      summaryWithBudget: (spent: string, limit: string) =>
+        `Wydano ${spent} z limitu ${limit} w tym miesiącu`,
+      summaryNoBudget: (spent: string) => `Wydano ${spent} w tym miesiącu`,
+    },
+    push: {
+      testTitle: "Nido — test",
+      testBody: "Powiadomienia push działają poprawnie.",
+      reminderTitle: "Nido — finanse",
+      reminderBody: "Dodaj dzisiejsze wydatki.",
+      bannerTitle: "Przypomnienia o wydatkach",
+      bannerDescription:
+        "Włącz powiadomienia, aby codziennie dostać przypomienie o zapisaniu wydatków.",
+      browserHint: "Działa w Chrome, Firefox i Safari 17+",
+    },
+    errors: {
+      invalidExpense: "Nieprawidłowe dane wydatku",
+      invalidCategory: "Nieprawidłowe dane kategorii",
+      invalidBudget: "Nieprawidłowe dane budżetu",
+      invalidNotificationSettings: "Nieprawidłowe ustawienia powiadomień",
+      expenseNotFound: "Nie znaleziono wydatku",
+      categoryNotFound: "Nie znaleziono kategorii",
+      categoryExists: "Kategoria o tej nazwie już istnieje",
+      categoryHasExpenses:
+        "Nie można usunąć kategorii z przypisanymi wydatkami",
+      categoryIsDefault: "Nie można usunąć domyślnej kategorii",
+      vapidNotConfigured: "VAPID keys nie są skonfigurowane",
+      pushNotSupported:
+        "Ta przeglądarka nie obsługuje powiadomień push (wymagany HTTPS i obsługa Push API)",
+      pushServiceUnavailable:
+        "Usługa push przeglądarki jest niedostępna. Użyj Chrome, Firefox lub Safari 17+, otwórz aplikację w normalnej przeglądarce (nie w podglądzie IDE) i w Brave włącz „Use Google services for push messaging” w ustawieniach prywatności.",
+      pushNoServiceWorker:
+        "Service worker nie jest aktywny. Odśwież stronę i spróbuj ponownie.",
+      pushServiceWorkerFailed:
+        "Nie udało się aktywować service workera. Wyczyść dane strony i spróbuj ponownie.",
+    },
   },
   common: {
     loading: "Ładowanie…",

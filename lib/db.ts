@@ -4,6 +4,11 @@ import mongoose from "mongoose";
 import "@/models/User";
 import "@/models/CustodyEntry";
 import "@/models/TrackingYear";
+import "@/models/ExpenseCategory";
+import "@/models/Expense";
+import "@/models/MonthlyBudget";
+import "@/models/NotificationSettings";
+import "@/models/PushSubscription";
 
 function resolveMongoUri(): string {
   const uri = process.env.MONGODB_URI?.trim();

@@ -22,6 +22,12 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: pl.app.name,
   description: pl.app.description,
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: pl.app.name,
+  },
 };
 
 export default function RootLayout({
