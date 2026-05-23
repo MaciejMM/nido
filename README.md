@@ -96,6 +96,8 @@ Household-shared expense tracking with monthly budget, analytics (Recharts), moc
 | `VAPID_SUBJECT` | e.g. `mailto:you@example.com` |
 | `CRON_SECRET` | Bearer token for `/api/cron/push-reminders` |
 
+Push reminders are triggered by a Vercel Cron Job (`vercel.json`, daily at 19:00 UTC). On the **Hobby** plan, crons may run at most once per day; use `0 19 * * *` (not hourly). For reminders at each user’s chosen hour, upgrade to **Pro** and set the schedule to `0 * * * *`.
+
 ## Architecture
 
 - **UI** (`app/`, `components/`, `hooks/`) — rendering and API calls only
