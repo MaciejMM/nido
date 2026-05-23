@@ -138,10 +138,19 @@ export function FinanceCharts({ analytics, loading }: FinanceChartsProps) {
     (c) => c.limitAmount != null && c.limitAmount > 0,
   );
   const hasCategoryLimits = categoriesWithLimits.length > 0;
+  const monthlyLimit = analytics?.limitAmount ?? 0;
+  const hasMonthlyBudget = monthlyLimit > 0;
+  const totalSpent = analytics?.totalSpent ?? 0;
+  const monthlyOverspend = hasMonthlyBudget
+    ? Math.max(0, totalSpent - monthlyLimit)
+    : 0;
+  const monthlyRemaining = hasMonthlyBudget ? monthlyLimit - totalSpent : 0;
+  const isOverMonthlyBudget = monthlyOverspend > 0;
   const totalAvailableLimit = categoriesWithLimits.reduce(
     (sum, c) => sum + Math.max(0, c.limitAmount! - c.amount),
     0,
   );
+  const showBudgetSummary = hasMonthlyBudget || hasCategoryLimits;
 
   return (
     <div className="space-y-4">
@@ -150,13 +159,27 @@ export function FinanceCharts({ analytics, loading }: FinanceChartsProps) {
           <CardTitle className="text-base font-semibold">
             {pl.finance.analytics.categoryLimits}
           </CardTitle>
-          {!loading && hasCategoryLimits && (
+          {!loading && showBudgetSummary && (
             <CardAction className="text-right">
               <p className="text-xs text-muted-foreground">
-                {pl.finance.analytics.totalAvailable}
+                {hasMonthlyBudget
+                  ? isOverMonthlyBudget
+                    ? pl.finance.analytics.budgetOverspend
+                    : pl.finance.dashboard.remaining
+                  : pl.finance.analytics.totalAvailable}
               </p>
-              <p className="text-base font-semibold tabular-nums">
-                {formatCurrency(totalAvailableLimit)}
+              <p
+                className={`text-base font-semibold tabular-nums ${
+                  isOverMonthlyBudget ? "text-destructive" : ""
+                }`}
+              >
+                {formatCurrency(
+                  hasMonthlyBudget
+                    ? isOverMonthlyBudget
+                      ? monthlyOverspend
+                      : monthlyRemaining
+                    : totalAvailableLimit,
+                )}
               </p>
             </CardAction>
           )}

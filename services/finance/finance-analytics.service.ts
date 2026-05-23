@@ -65,11 +65,11 @@ export async function getFinanceAnalytics(
   householdId = DEFAULT_HOUSEHOLD_ID,
 ): Promise<FinanceAnalyticsDto> {
   const { start, end } = getMonthDateRange(year, month);
-  const totalSpent = await expenseService.sumExpensesInMonth(
-    year,
-    month,
-    householdId,
-  );
+  const [totalSpent, budget] = await Promise.all([
+    expenseService.sumExpensesInMonth(year, month, householdId),
+    budgetService.getBudget(year, month, householdId),
+  ]);
+  const limitAmount = budget?.limitAmount ?? 0;
 
   const [categoryAgg, householdCategories] = await Promise.all([
     Expense.aggregate<{
@@ -186,6 +186,7 @@ export async function getFinanceAnalytics(
   return {
     year,
     month,
+    limitAmount,
     categoryBreakdown,
     monthlyTrend,
     dailySpending,

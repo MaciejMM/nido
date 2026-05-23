@@ -273,6 +273,7 @@ export const pl = {
       byCategory: "Według kategorii",
       categoryLimits: "Wykorzystanie limitów",
       totalAvailable: "Łącznie dostępne",
+      budgetOverspend: "Przekroczenie budżetu",
       trend: "Trend (6 mies.)",
       daily: "Wydatki dzienne",
       noData: "Brak danych do wykresu",

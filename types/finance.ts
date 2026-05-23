@@ -129,6 +129,7 @@ export interface DailySpendItem {
 export interface FinanceAnalyticsDto {
   year: number;
   month: number;
+  limitAmount: number;
   categoryBreakdown: CategorySpendItem[];
   monthlyTrend: MonthlySpendItem[];
   dailySpending: DailySpendItem[];
