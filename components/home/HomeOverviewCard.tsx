@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ChevronRightIcon, type LucideIcon } from "lucide-react";
 

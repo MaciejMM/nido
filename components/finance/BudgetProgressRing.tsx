@@ -1,5 +1,3 @@
-"use client";
-
 interface BudgetProgressRingProps {
   percent: number;
   size?: number;

@@ -1,22 +1,30 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Roboto, Roboto_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AppProviders } from "@/components/providers/app-providers";
+
+const Analytics = dynamic(() =>
+  import("@vercel/analytics/next").then((mod) => mod.Analytics),
+);
+const SpeedInsights = dynamic(() =>
+  import("@vercel/speed-insights/next").then((mod) => mod.SpeedInsights),
+);
 import { pl } from "@/lib/i18n";
 
 import "./globals.css";
 
 const roboto = Roboto({
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "700"],
   subsets: ["latin", "latin-ext"],
   variable: "--font-roboto",
+  display: "swap",
 });
 
 const robotoMono = Roboto_Mono({
   subsets: ["latin", "latin-ext"],
   variable: "--font-roboto-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

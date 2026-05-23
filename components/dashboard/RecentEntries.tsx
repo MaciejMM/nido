@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { formatDateRange } from "@/lib/format";
 import { pl } from "@/lib/i18n";

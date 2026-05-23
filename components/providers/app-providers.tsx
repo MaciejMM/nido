@@ -1,9 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import { QueryProvider } from "@/components/providers/query-provider";
 import { YearFilterProvider } from "@/components/providers/year-filter-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
+
+const Toaster = dynamic(
+  () => import("@/components/ui/sonner").then((mod) => mod.Toaster),
+  { ssr: false },
+);
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (

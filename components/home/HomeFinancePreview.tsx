@@ -1,23 +1,41 @@
 "use client";
 
 import { WalletIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { BudgetProgressRing } from "@/components/finance/BudgetProgressRing";
 import { HomeOverviewCard } from "@/components/home/HomeOverviewCard";
-import { useFinanceDashboard } from "@/hooks/finance/use-finance-dashboard";
+import { financeKeys } from "@/hooks/finance/query-keys";
+import { fetchFinanceDashboard } from "@/lib/finance-api-client";
 import {
   formatCurrency,
   formatFinanceMonth,
   formatPercent,
 } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { BudgetDashboardDto } from "@/types";
 import { useFinanceUiStore } from "@/stores/finance-ui.store";
+import type { BudgetDashboardDto } from "@/types";
 
-export function HomeFinancePreview() {
+interface HomeFinancePreviewProps {
+  initialYear: number;
+  initialMonth: number;
+  initialDashboard: BudgetDashboardDto;
+}
+
+export function HomeFinancePreview({
+  initialYear,
+  initialMonth,
+  initialDashboard,
+}: HomeFinancePreviewProps) {
   const { year, month } = useFinanceUiStore();
-  const { data: dashboard, isLoading } = useFinanceDashboard(year, month);
+  const matchesInitial = year === initialYear && month === initialMonth;
+
+  const { data: dashboard, isLoading } = useQuery({
+    queryKey: financeKeys.dashboard(year, month),
+    queryFn: () => fetchFinanceDashboard(year, month),
+    initialData: matchesInitial ? initialDashboard : undefined,
+    staleTime: 30_000,
+  });
 
   return (
     <HomeOverviewCard
@@ -26,18 +44,24 @@ export function HomeFinancePreview() {
       subtitle={formatFinanceMonth(year, month)}
       icon={WalletIcon}
     >
-      {isLoading ? (
-        <div className="flex items-center gap-4">
-          <Skeleton className="size-14 shrink-0 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-24" />
-          </div>
-        </div>
+      {isLoading && !dashboard ? (
+        <HomeFinanceSkeleton />
       ) : dashboard ? (
         <HomeFinanceContent dashboard={dashboard} />
       ) : null}
     </HomeOverviewCard>
+  );
+}
+
+function HomeFinanceSkeleton() {
+  return (
+    <div className="flex items-center gap-4" aria-hidden>
+      <div className="size-14 shrink-0 rounded-full bg-muted animate-pulse" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+        <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+      </div>
+    </div>
   );
 }
 
