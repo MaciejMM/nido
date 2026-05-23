@@ -1,12 +1,15 @@
 import type {
   ApiErrorBody,
   BudgetDashboardDto,
+  BulkUpdateExpenseCategoryInput,
+  BulkUpdateExpenseCategoryResult,
   CreateCategoryInput,
   UpdateCategoryInput,
   CreateExpenseInput,
   ExpenseCategoryDto,
   ExpenseDto,
   FinanceAnalyticsDto,
+  ImportResult,
   ListExpensesFilters,
   MonthAnalysisDto,
   MonthlyBudgetDto,
@@ -82,6 +85,33 @@ export async function updateExpense(
 export async function deleteExpense(id: string): Promise<void> {
   const response = await fetch(`/api/expenses/${id}`, { method: "DELETE" });
   await parseResponse<{ success: boolean }>(response);
+}
+
+export async function bulkUpdateExpenseCategory(
+  input: BulkUpdateExpenseCategoryInput,
+): Promise<BulkUpdateExpenseCategoryResult> {
+  const response = await fetch("/api/expenses/bulk", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<BulkUpdateExpenseCategoryResult>(response);
+}
+
+export async function importExpensesFromCsv(
+  file: File,
+  year: number,
+  month: number,
+): Promise<ImportResult> {
+  const query = buildQuery({ year, month });
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`/api/expenses/import${query}`, {
+    method: "POST",
+    body: formData,
+  });
+  return parseResponse<ImportResult>(response);
 }
 
 export async function fetchCategories(): Promise<ExpenseCategoryDto[]> {

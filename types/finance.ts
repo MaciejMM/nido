@@ -17,8 +17,18 @@ export interface ExpenseDto {
   date: string;
   notes?: string;
   currency: string;
+  importHash?: string;
+  importSource?: "mbank_csv";
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ImportResult {
+  imported: number;
+  duplicatesSkipped: number;
+  outOfMonthSkipped: number;
+  invalidRows: number;
+  errors?: string[];
 }
 
 export interface CreateExpenseInput {
@@ -35,6 +45,15 @@ export interface UpdateExpenseInput {
   categoryId?: string;
   date?: Date;
   notes?: string;
+}
+
+export interface BulkUpdateExpenseCategoryInput {
+  ids: string[];
+  categoryId: string;
+}
+
+export interface BulkUpdateExpenseCategoryResult {
+  updated: number;
 }
 
 export interface ListExpensesFilters {

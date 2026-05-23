@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 import { DEFAULT_CURRENCY, DEFAULT_HOUSEHOLD_ID } from "@/lib/finance/constants";
 import {
+  bulkUpdateExpenseCategorySchema,
   createExpenseSchema,
   listExpensesQuerySchema,
   updateExpenseSchema,
@@ -10,6 +11,7 @@ import { pl } from "@/lib/i18n";
 import { Expense, type IExpense } from "@/models/Expense";
 import type { IExpenseCategory } from "@/models/ExpenseCategory";
 import type {
+  BulkUpdateExpenseCategoryResult,
   CreateExpenseInput,
   ExpenseDto,
   ListExpensesFilters,
@@ -183,6 +185,39 @@ export async function deleteExpense(
   if (!result) {
     throw new NotFoundError(pl.finance.errors.expenseNotFound);
   }
+}
+
+export async function bulkUpdateExpenseCategory(
+  ids: string[],
+  categoryId: string,
+  householdId = DEFAULT_HOUSEHOLD_ID,
+): Promise<BulkUpdateExpenseCategoryResult> {
+  const parsed = bulkUpdateExpenseCategorySchema.safeParse({ ids, categoryId });
+  if (!parsed.success) {
+    throw new ValidationError(
+      pl.finance.errors.invalidExpense,
+      parsed.error.flatten(),
+    );
+  }
+
+  const category = await categoryService.getCategoryById(
+    parsed.data.categoryId,
+    householdId,
+  );
+  if (!category) {
+    throw new NotFoundError(pl.finance.errors.categoryNotFound);
+  }
+
+  const objectIds = parsed.data.ids
+    .filter((id) => Types.ObjectId.isValid(id))
+    .map((id) => new Types.ObjectId(id));
+
+  const result = await Expense.updateMany(
+    { _id: { $in: objectIds }, householdId },
+    { $set: { categoryId: new Types.ObjectId(parsed.data.categoryId) } },
+  ).exec();
+
+  return { updated: result.modifiedCount ?? 0 };
 }
 
 export async function sumExpensesInMonth(

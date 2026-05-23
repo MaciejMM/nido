@@ -27,6 +27,14 @@ export const listExpensesQuerySchema = z.object({
   dateTo: z.coerce.date().optional(),
 });
 
+export const bulkUpdateExpenseCategorySchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(500),
+  categoryId: z.string().min(1),
+});
+
 export type CreateExpenseSchema = z.infer<typeof createExpenseSchema>;
 export type UpdateExpenseSchema = z.infer<typeof updateExpenseSchema>;
 export type ListExpensesQuerySchema = z.infer<typeof listExpensesQuerySchema>;
+export type BulkUpdateExpenseCategorySchema = z.infer<
+  typeof bulkUpdateExpenseCategorySchema
+>;

@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpenseCsvImport } from "@/components/finance/ExpenseCsvImport";
 import { ExpenseFilters } from "@/components/finance/ExpenseFilters";
 import { ExpenseList } from "@/components/finance/ExpenseList";
 import { FinanceMonthSwitcher } from "@/components/finance/FinanceMonthSwitcher";
@@ -17,7 +18,7 @@ export default function FinanceExpensesPage() {
     setEditingExpense,
   } = useFinanceUiStore();
   const { categories } = useCategories();
-  const { expenses, loading, removeExpense } = useExpenses({
+  const { expenses, loading, removeExpense, bulkUpdateCategory } = useExpenses({
     year,
     month,
     categoryId: categoryFilterId ?? undefined,
@@ -35,17 +36,27 @@ export default function FinanceExpensesPage() {
           {pl.finance.expenses.title}
         </h1>
       </div>
-      <FinanceMonthSwitcher />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full sm:w-auto">
+          <FinanceMonthSwitcher />
+        </div>
+        <ExpenseCsvImport year={year} month={month} />
+      </div>
       <ExpenseFilters
         categories={categories}
         categoryId={categoryFilterId}
         onCategoryChange={setCategoryFilterId}
       />
       <ExpenseList
+        key={`${year}-${month}-${categoryFilterId ?? "all"}`}
         expenses={expenses}
         loading={loading}
+        categories={categories}
         onEdit={handleEdit}
         onDelete={removeExpense}
+        onBulkUpdateCategory={async (ids, categoryId) => {
+          await bulkUpdateCategory({ ids, categoryId });
+        }}
       />
     </div>
   );

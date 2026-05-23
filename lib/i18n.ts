@@ -210,6 +210,37 @@ export const pl = {
       filterCategory: "Kategoria",
       filterAll: "Wszystkie",
       fillRequired: "Uzupełnij wymagane pola",
+      importButton: "Importuj z banku",
+      importing: "Importowanie…",
+      importSuccess: (
+        imported: number,
+        duplicates: number,
+        outOfMonth: number,
+      ) => {
+        const parts = [`Zaimportowano ${imported}`];
+        if (duplicates > 0) {
+          parts.push(`pominięto ${duplicates} duplikatów`);
+        }
+        if (outOfMonth > 0) {
+          parts.push(`${outOfMonth} poza wybranym miesiącem`);
+        }
+        return parts.join(", ");
+      },
+      importFailed: "Import nie powiódł się",
+      importInvalidFile: "Nieobsługiwany plik CSV (oczekiwany format mBank)",
+      importNoFile: "Wybierz plik CSV",
+      importFileTooLarge: "Plik jest za duży (maks. 2 MB)",
+      selectAll: "Zaznacz wszystkie",
+      selectedCount: (n: number) =>
+        n === 1 ? "1 wydatek zaznaczony" : `${n} wydatków zaznaczonych`,
+      bulkAssignCategory: "Przypisz kategorię",
+      bulkAssigning: "Przypisywanie…",
+      bulkCategoryUpdated: (n: number) =>
+        n === 1
+          ? "Zaktualizowano kategorię 1 wydatku"
+          : `Zaktualizowano kategorię ${n} wydatków`,
+      clearSelection: "Anuluj zaznaczenie",
+      bulkSelectCategory: "Wybierz kategorię",
     },
     categories: {
       title: "Kategorie",
@@ -311,6 +342,8 @@ export const pl = {
       invalidExpense: "Nieprawidłowe dane wydatku",
       invalidCategory: "Nieprawidłowe dane kategorii",
       invalidBudget: "Nieprawidłowe dane budżetu",
+      invalidImport: "Nieprawidłowe parametry importu",
+      importFailed: "Import wydatków nie powiódł się",
       invalidNotificationSettings: "Nieprawidłowe ustawienia powiadomień",
       expenseNotFound: "Nie znaleziono wydatku",
       categoryNotFound: "Nie znaleziono kategorii",
