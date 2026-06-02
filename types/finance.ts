@@ -171,3 +171,68 @@ export interface PushSubscribeInput {
     auth: string;
   };
 }
+
+export type PersonalExpenseVisibility = "private" | "shared";
+
+export interface PersonalExpenseDto {
+  id: string;
+  year: number;
+  month: number;
+  title: string;
+  amount: number;
+  currency: string;
+  isPaid: boolean;
+  paidAt?: string;
+  notes?: string;
+  sortOrder: number;
+  visibility: PersonalExpenseVisibility;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PersonalExpenseSummary {
+  totalAmount: number;
+  paidAmount: number;
+  remainingAmount: number;
+  paidCount: number;
+  unpaidCount: number;
+  currency: string;
+}
+
+export interface PersonalExpenseListResponse {
+  items: PersonalExpenseDto[];
+  summary: PersonalExpenseSummary;
+}
+
+export interface CreatePersonalExpenseInput {
+  year: number;
+  month: number;
+  title: string;
+  amount: number;
+  notes?: string;
+  visibility?: PersonalExpenseVisibility;
+}
+
+export interface UpdatePersonalExpenseInput {
+  title?: string;
+  amount?: number;
+  notes?: string | null;
+  visibility?: PersonalExpenseVisibility;
+}
+
+export interface PatchPersonalExpenseInput {
+  isPaid?: boolean;
+  title?: string;
+  amount?: number;
+  notes?: string | null;
+}
+
+export interface CopyFromPreviousMonthInput {
+  year: number;
+  month: number;
+  expenseIds: string[];
+}
+
+export interface CopyFromPreviousMonthResult {
+  copied: number;
+}

@@ -36,6 +36,7 @@ export function invalidateFinanceData(
 
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: ["expenses"] }),
+    queryClient.invalidateQueries({ queryKey: ["personal-expenses"] }),
     queryClient.invalidateQueries({ queryKey: financeKeys.categories }),
     ...uniqueMonths.map((m) => invalidateFinanceMonth(queryClient, m.year, m.month)),
     ...(uniqueMonths.length === 0

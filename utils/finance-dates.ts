@@ -85,3 +85,13 @@ export function isCurrentMonth(
 export function monthKey(year: number, month: number): string {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
+
+export function getPreviousMonth(
+  year: number,
+  month: number,
+): { year: number; month: number } {
+  if (month === 1) {
+    return { year: year - 1, month: 12 };
+  }
+  return { year, month: month - 1 };
+}

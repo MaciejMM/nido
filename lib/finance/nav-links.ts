@@ -1,6 +1,7 @@
 import {
   BarChart3Icon,
   LayoutDashboardIcon,
+  ListChecksIcon,
   MoreHorizontalIcon,
   ReceiptIcon,
   type LucideIcon,
@@ -25,6 +26,11 @@ export const financeNavLinks: FinanceNavLink[] = [
     href: "/finance/expenses",
     label: pl.finance.nav.expenses,
     icon: ReceiptIcon,
+  },
+  {
+    href: "/finance/personal-expenses",
+    label: pl.finance.nav.personalExpenses,
+    icon: ListChecksIcon,
   },
   {
     href: "/finance/analytics",

@@ -4,6 +4,8 @@ export const financeKeys = {
   all: ["finance"] as const,
   expenses: (filters: ListExpensesFilters) =>
     ["expenses", filters] as const,
+  personalExpenses: (year: number, month: number) =>
+    ["personal-expenses", year, month] as const,
   categories: ["categories"] as const,
   budget: (year: number, month: number) => ["budget", year, month] as const,
   dashboard: (year: number, month: number) =>

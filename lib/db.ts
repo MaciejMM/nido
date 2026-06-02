@@ -6,6 +6,7 @@ import "@/models/CustodyEntry";
 import "@/models/TrackingYear";
 import "@/models/ExpenseCategory";
 import "@/models/Expense";
+import "@/models/PersonalExpense";
 import "@/models/MonthlyBudget";
 import "@/models/NotificationSettings";
 import "@/models/PushSubscription";
