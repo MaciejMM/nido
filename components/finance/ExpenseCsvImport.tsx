@@ -35,6 +35,7 @@ export function ExpenseCsvImport({ year, month }: ExpenseCsvImportProps) {
           result.imported,
           result.duplicatesSkipped,
           result.outOfMonthSkipped,
+          result.carriedFromPreviousMonth,
         ),
       );
     } catch (error) {

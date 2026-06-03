@@ -20,6 +20,9 @@
 # production
 /build
 
+# bank CSV fixtures (never commit real exports)
+lib/finance/bank-import/fixtures/*.csv
+
 # misc
 .DS_Store
 *.pem

@@ -12,6 +12,8 @@ export interface IExpense extends Document {
   householdId: string;
   importHash?: string;
   importSource?: ExpenseImportSource;
+  attributedYear?: number;
+  attributedMonth?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,12 +33,15 @@ const expenseSchema = new Schema<IExpense>(
     householdId: { type: String, required: true, default: "default" },
     importHash: { type: String },
     importSource: { type: String, enum: ["mbank_csv"] },
+    attributedYear: { type: Number, min: 2000, max: 2100 },
+    attributedMonth: { type: Number, min: 1, max: 12 },
   },
   { timestamps: true },
 );
 
 expenseSchema.index({ householdId: 1, date: -1 });
 expenseSchema.index({ householdId: 1, categoryId: 1, date: -1 });
+expenseSchema.index({ householdId: 1, attributedYear: 1, attributedMonth: 1 });
 expenseSchema.index(
   { householdId: 1, importHash: 1 },
   { unique: true, sparse: true },

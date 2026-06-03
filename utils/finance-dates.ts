@@ -95,3 +95,15 @@ export function getPreviousMonth(
   }
   return { year, month: month - 1 };
 }
+
+export function getDaysSinceDate(
+  fromDate: Date,
+  toDate: Date = new Date(),
+  timeZone = FINANCE_TIMEZONE,
+): number {
+  const from = getCalendarPartsInTimezone(fromDate, timeZone);
+  const to = getCalendarPartsInTimezone(toDate, timeZone);
+  const fromUtc = Date.UTC(from.year, from.month - 1, from.day);
+  const toUtc = Date.UTC(to.year, to.month - 1, to.day);
+  return Math.floor((toUtc - fromUtc) / (24 * 60 * 60 * 1000)) + 1;
+}

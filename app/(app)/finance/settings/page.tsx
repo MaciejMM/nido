@@ -9,6 +9,7 @@ import { NotificationSettingsForm } from "@/components/finance/NotificationSetti
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAccountBalance } from "@/hooks/finance/use-account-balance";
 import { useBudget } from "@/hooks/finance/use-budget";
 import { useCategories } from "@/hooks/finance/use-categories";
 import { getCategoryIcon } from "@/lib/finance/category-icons";
@@ -20,8 +21,14 @@ const CATEGORY_PREVIEW_MAX = 5;
 export default function FinanceSettingsPage() {
   const { year, month } = useFinanceUiStore();
   const { budget, saveBudget, isSaving } = useBudget(year, month);
+  const {
+    accountBalance,
+    saveAccountBalance,
+    isSaving: isSavingBalance,
+  } = useAccountBalance();
   const { categories, loading: categoriesLoading } = useCategories();
   const [limit, setLimit] = useState("");
+  const [balance, setBalance] = useState("");
 
   const previewCategories = categories.slice(0, CATEGORY_PREVIEW_MAX);
   const moreCategories = categories.length - previewCategories.length;
@@ -29,6 +36,26 @@ export default function FinanceSettingsPage() {
   useEffect(() => {
     setLimit(budget?.limitAmount != null ? String(budget.limitAmount) : "");
   }, [budget]);
+
+  useEffect(() => {
+    setBalance(
+      accountBalance?.balance != null ? String(accountBalance.balance) : "",
+    );
+  }, [accountBalance]);
+
+  const handleSaveBalance = async () => {
+    const amount = Number(balance);
+    if (!Number.isFinite(amount) || amount < 0) {
+      toast.error(pl.finance.expenses.fillRequired);
+      return;
+    }
+    try {
+      await saveAccountBalance({ balance: amount });
+      toast.success(pl.finance.settings.accountBalanceSaved);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : pl.common.requestFailed);
+    }
+  };
 
   const handleSaveBudget = async () => {
     const limitAmount = Number(limit);
@@ -51,6 +78,27 @@ export default function FinanceSettingsPage() {
           {pl.finance.settings.title}
         </h1>
       </div>
+
+      <section className="space-y-3 rounded-xl border border-border p-4">
+        <Label>{pl.finance.settings.accountBalance}</Label>
+        <p className="text-sm text-muted-foreground">
+          {pl.finance.settings.accountBalanceHint}
+        </p>
+        <Input
+          type="number"
+          min={0}
+          step="0.01"
+          value={balance}
+          onChange={(e) => setBalance(e.target.value)}
+          placeholder="2744"
+        />
+        <Button
+          onClick={() => void handleSaveBalance()}
+          disabled={isSavingBalance}
+        >
+          {isSavingBalance ? pl.finance.expenses.saving : pl.finance.expenses.save}
+        </Button>
+      </section>
 
       <section className="space-y-3 rounded-xl border border-border p-4">
         <Label>{pl.finance.settings.budgetLimit}</Label>

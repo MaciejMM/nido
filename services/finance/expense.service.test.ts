@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { updateManyMock, getCategoryByIdMock } = vi.hoisted(() => ({
-  updateManyMock: vi.fn(),
-  getCategoryByIdMock: vi.fn(),
-}));
+const { updateManyMock, deleteManyMock, getCategoryByIdMock } = vi.hoisted(
+  () => ({
+    updateManyMock: vi.fn(),
+    deleteManyMock: vi.fn(),
+    getCategoryByIdMock: vi.fn(),
+  }),
+);
 
 vi.mock("@/models/Expense", () => ({
   Expense: {
     updateMany: updateManyMock,
+    deleteMany: deleteManyMock,
   },
 }));
 
@@ -15,7 +19,10 @@ vi.mock("./category.service", () => ({
   getCategoryById: getCategoryByIdMock,
 }));
 
-import { bulkUpdateExpenseCategory } from "./expense.service";
+import {
+  bulkDeleteExpenses,
+  bulkUpdateExpenseCategory,
+} from "./expense.service";
 
 describe("expense.service bulkUpdateExpenseCategory", () => {
   beforeEach(() => {
@@ -53,5 +60,25 @@ describe("expense.service bulkUpdateExpenseCategory", () => {
       bulkUpdateExpenseCategory(["507f1f77bcf86cd799439012"], "missing"),
     ).rejects.toThrow();
     expect(updateManyMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("expense.service bulkDeleteExpenses", () => {
+  beforeEach(() => {
+    deleteManyMock.mockReset();
+  });
+
+  it("deletes expenses by ids", async () => {
+    deleteManyMock.mockReturnValue({
+      exec: vi.fn().mockResolvedValue({ deletedCount: 2 }),
+    });
+
+    const result = await bulkDeleteExpenses([
+      "507f1f77bcf86cd799439012",
+      "507f1f77bcf86cd799439013",
+    ]);
+
+    expect(result).toEqual({ deleted: 2 });
+    expect(deleteManyMock).toHaveBeenCalledOnce();
   });
 });

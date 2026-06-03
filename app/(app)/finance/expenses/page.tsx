@@ -18,11 +18,12 @@ export default function FinanceExpensesPage() {
     setEditingExpense,
   } = useFinanceUiStore();
   const { categories } = useCategories();
-  const { expenses, loading, removeExpense, bulkUpdateCategory } = useExpenses({
+  const { expenses, loading, removeExpense, bulkUpdateCategory, bulkDelete } =
+    useExpenses({
     year,
     month,
-    categoryId: categoryFilterId ?? undefined,
-  });
+      categoryId: categoryFilterId ?? undefined,
+    });
 
   const handleEdit = (expense: Parameters<typeof setEditingExpense>[0]) => {
     setEditingExpense(expense);
@@ -56,6 +57,9 @@ export default function FinanceExpensesPage() {
         onDelete={removeExpense}
         onBulkUpdateCategory={async (ids, categoryId) => {
           await bulkUpdateCategory({ ids, categoryId });
+        }}
+        onBulkDelete={async (ids) => {
+          await bulkDelete({ ids });
         }}
       />
     </div>

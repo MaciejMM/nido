@@ -29,6 +29,82 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { pl } from "@/lib/i18n";
 import type { ExpenseCategoryDto, ExpenseDto } from "@/types";
 
+interface ExpenseRowsProps {
+  items: ExpenseDto[];
+  selectedIds: Set<string>;
+  onToggleOne: (id: string, checked: boolean) => void;
+  onEdit: (expense: ExpenseDto) => void;
+  onDelete: (id: string) => void;
+}
+
+function ExpenseRows({
+  items,
+  selectedIds,
+  onToggleOne,
+  onEdit,
+  onDelete,
+}: ExpenseRowsProps) {
+  return (
+    <ul className="space-y-2">
+      {items.map((expense) => {
+        const cat = expense.category;
+        const Icon = getCategoryIcon(cat?.icon ?? "Tag");
+        const isSelected = selectedIds.has(expense.id);
+        return (
+          <li
+            key={expense.id}
+            className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-3"
+          >
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) =>
+                onToggleOne(expense.id, checked === true)
+              }
+              aria-label={expense.title}
+            />
+            <div
+              className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted"
+              style={{ color: cat?.color }}
+            >
+              <Icon className="size-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium">{expense.title}</p>
+              <p className="text-xs text-muted-foreground">
+                {cat?.name} ·{" "}
+                {format(new Date(expense.date), "d MMM yyyy", {
+                  locale: dateLocale,
+                })}
+              </p>
+            </div>
+            <p className="shrink-0 font-semibold tabular-nums">
+              {formatCurrency(expense.amount, expense.currency)}
+            </p>
+            <div className="flex shrink-0 gap-1">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => onEdit(expense)}
+                aria-label={pl.finance.expenses.edit}
+              >
+                <PencilIcon className="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => onDelete(expense.id)}
+                aria-label={pl.finance.expenses.delete}
+              >
+                <Trash2Icon className="size-4" />
+              </Button>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 interface ExpenseListProps {
   expenses: ExpenseDto[];
   loading: boolean;
@@ -36,6 +112,7 @@ interface ExpenseListProps {
   onEdit: (expense: ExpenseDto) => void;
   onDelete: (id: string) => Promise<void>;
   onBulkUpdateCategory: (ids: string[], categoryId: string) => Promise<void>;
+  onBulkDelete: (ids: string[]) => Promise<void>;
 }
 
 export function ExpenseList({
@@ -45,12 +122,30 @@ export function ExpenseList({
   onEdit,
   onDelete,
   onBulkUpdateCategory,
+  onBulkDelete,
 }: ExpenseListProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [bulkCategoryId, setBulkCategoryId] = useState<string>("");
   const [bulkAssigning, setBulkAssigning] = useState(false);
+
+  const bulkBusy = bulkAssigning || bulkDeleting;
+
+  const { regularExpenses, carriedExpenses } = useMemo(() => {
+    const regular: ExpenseDto[] = [];
+    const carried: ExpenseDto[] = [];
+    for (const expense of expenses) {
+      if (expense.carriedFromPreviousMonth) {
+        carried.push(expense);
+      } else {
+        regular.push(expense);
+      }
+    }
+    return { regularExpenses: regular, carriedExpenses: carried };
+  }, [expenses]);
 
   const visibleIds = useMemo(() => expenses.map((e) => e.id), [expenses]);
   const selectedCount = selectedIds.size;
@@ -93,6 +188,23 @@ export function ExpenseList({
       );
     } finally {
       setBulkAssigning(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedCount === 0) return;
+    setBulkDeleting(true);
+    try {
+      await onBulkDelete([...selectedIds]);
+      toast.success(pl.finance.expenses.bulkDeleted(selectedCount));
+      clearSelection();
+      setBulkDeleteOpen(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : pl.common.requestFailed,
+      );
+    } finally {
+      setBulkDeleting(false);
     }
   };
 
@@ -163,7 +275,7 @@ export function ExpenseList({
             </Select>
             <Button
               size="sm"
-              disabled={!bulkCategoryId || bulkAssigning}
+              disabled={!bulkCategoryId || bulkBusy}
               onClick={() => void handleBulkAssign()}
             >
               {bulkAssigning
@@ -171,10 +283,18 @@ export function ExpenseList({
                 : pl.finance.expenses.bulkAssignCategory}
             </Button>
             <Button
+              variant="destructive"
+              size="sm"
+              disabled={bulkBusy}
+              onClick={() => setBulkDeleteOpen(true)}
+            >
+              {pl.finance.expenses.bulkDeleteSelected}
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
               onClick={clearSelection}
-              disabled={bulkAssigning}
+              disabled={bulkBusy}
             >
               {pl.finance.expenses.clearSelection}
             </Button>
@@ -194,63 +314,33 @@ export function ExpenseList({
         </span>
       </div>
 
-      <ul className="space-y-2">
-        {expenses.map((expense) => {
-          const cat = expense.category;
-          const Icon = getCategoryIcon(cat?.icon ?? "Tag");
-          const isSelected = selectedIds.has(expense.id);
-          return (
-            <li
-              key={expense.id}
-              className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-3"
-            >
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) =>
-                  toggleOne(expense.id, checked === true)
-                }
-                aria-label={expense.title}
-              />
-              <div
-                className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted"
-                style={{ color: cat?.color }}
-              >
-                <Icon className="size-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{expense.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {cat?.name} ·{" "}
-                  {format(new Date(expense.date), "d MMM yyyy", {
-                    locale: dateLocale,
-                  })}
-                </p>
-              </div>
-              <p className="shrink-0 font-semibold tabular-nums">
-                {formatCurrency(expense.amount, expense.currency)}
-              </p>
-              <div className="flex shrink-0 gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => onEdit(expense)}
-                  aria-label={pl.finance.expenses.edit}
-                >
-                  <PencilIcon className="size-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => setDeleteId(expense.id)}
-                  aria-label={pl.finance.expenses.delete}
-                >
-                  <Trash2Icon className="size-4" />
-                </Button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <ExpenseRows
+        items={regularExpenses}
+        selectedIds={selectedIds}
+        onToggleOne={toggleOne}
+        onEdit={onEdit}
+        onDelete={setDeleteId}
+      />
+
+      {carriedExpenses.length > 0 && (
+        <div className="mt-6 space-y-2">
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 px-3 py-2">
+            <p className="text-sm font-medium">
+              {pl.finance.expenses.carriedFromPreviousSection}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {pl.finance.expenses.carriedFromPreviousHint}
+            </p>
+          </div>
+          <ExpenseRows
+            items={carriedExpenses}
+            selectedIds={selectedIds}
+            onToggleOne={toggleOne}
+            onEdit={onEdit}
+            onDelete={setDeleteId}
+          />
+        </div>
+      )}
 
       <Dialog open={Boolean(deleteId)} onOpenChange={() => setDeleteId(null)}>
         <DialogContent>
@@ -270,6 +360,38 @@ export function ExpenseList({
               onClick={() => void confirmDelete()}
             >
               {deleting ? pl.finance.expenses.deleting : pl.finance.expenses.delete}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={bulkDeleteOpen}
+        onOpenChange={(open) => !bulkDeleting && setBulkDeleteOpen(open)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{pl.finance.expenses.bulkDeleteTitle}</DialogTitle>
+            <DialogDescription>
+              {pl.finance.expenses.bulkDeleteDescription(selectedCount)}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setBulkDeleteOpen(false)}
+              disabled={bulkDeleting}
+            >
+              {pl.finance.expenses.cancel}
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={bulkDeleting}
+              onClick={() => void handleBulkDelete()}
+            >
+              {bulkDeleting
+                ? pl.finance.expenses.bulkDeleting
+                : pl.finance.expenses.delete}
             </Button>
           </DialogFooter>
         </DialogContent>

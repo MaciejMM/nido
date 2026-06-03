@@ -27,7 +27,12 @@ export async function GET(request: NextRequest) {
     const year = parsed.data.year ?? now.getFullYear();
     const month = parsed.data.month ?? now.getMonth() + 1;
 
-    const analytics = await analyticsService.getFinanceAnalytics(year, month);
+    const analytics = await analyticsService.getFinanceAnalytics(
+      year,
+      month,
+      undefined,
+      now,
+    );
     return NextResponse.json(analytics);
   } catch (error) {
     const { status, body } = toErrorResponse(error);

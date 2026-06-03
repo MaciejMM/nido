@@ -32,9 +32,14 @@ export const bulkUpdateExpenseCategorySchema = z.object({
   categoryId: z.string().min(1),
 });
 
+export const bulkDeleteExpensesSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(500),
+});
+
 export type CreateExpenseSchema = z.infer<typeof createExpenseSchema>;
 export type UpdateExpenseSchema = z.infer<typeof updateExpenseSchema>;
 export type ListExpensesQuerySchema = z.infer<typeof listExpensesQuerySchema>;
 export type BulkUpdateExpenseCategorySchema = z.infer<
   typeof bulkUpdateExpenseCategorySchema
 >;
+export type BulkDeleteExpensesSchema = z.infer<typeof bulkDeleteExpensesSchema>;

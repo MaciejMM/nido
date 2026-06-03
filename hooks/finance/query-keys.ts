@@ -15,4 +15,5 @@ export const financeKeys = {
   monthAnalysis: (year: number, month: number) =>
     ["ai-month-analysis", year, month] as const,
   notificationSettings: ["notification-settings"] as const,
+  accountBalance: ["account-balance"] as const,
 };

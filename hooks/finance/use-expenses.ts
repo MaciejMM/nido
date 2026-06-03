@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  bulkDeleteExpenses,
   bulkUpdateExpenseCategory,
   createExpense,
   deleteExpense,
@@ -10,6 +11,7 @@ import {
   updateExpense,
 } from "@/lib/finance-api-client";
 import type {
+  BulkDeleteExpensesInput,
   BulkUpdateExpenseCategoryInput,
   CreateExpenseInput,
   ListExpensesFilters,
@@ -73,6 +75,11 @@ export function useExpenses(filters: ListExpensesFilters = {}) {
     onSuccess: () => invalidate(),
   });
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (input: BulkDeleteExpensesInput) => bulkDeleteExpenses(input),
+    onSuccess: () => invalidate(),
+  });
+
   return {
     expenses: query.data ?? [],
     loading: query.isLoading,
@@ -83,10 +90,12 @@ export function useExpenses(filters: ListExpensesFilters = {}) {
       updateMutation.mutateAsync({ id, input }),
     removeExpense: deleteMutation.mutateAsync,
     bulkUpdateCategory: bulkUpdateCategoryMutation.mutateAsync,
+    bulkDelete: bulkDeleteMutation.mutateAsync,
     isSaving:
       createMutation.isPending ||
       updateMutation.isPending ||
       deleteMutation.isPending,
     isBulkUpdating: bulkUpdateCategoryMutation.isPending,
+    isBulkDeleting: bulkDeleteMutation.isPending,
   };
 }

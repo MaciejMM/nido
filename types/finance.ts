@@ -19,6 +19,9 @@ export interface ExpenseDto {
   currency: string;
   importHash?: string;
   importSource?: "mbank_csv";
+  attributedYear?: number;
+  attributedMonth?: number;
+  carriedFromPreviousMonth?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,6 +30,7 @@ export interface ImportResult {
   imported: number;
   duplicatesSkipped: number;
   outOfMonthSkipped: number;
+  carriedFromPreviousMonth: number;
   invalidRows: number;
   errors?: string[];
 }
@@ -54,6 +58,14 @@ export interface BulkUpdateExpenseCategoryInput {
 
 export interface BulkUpdateExpenseCategoryResult {
   updated: number;
+}
+
+export interface BulkDeleteExpensesInput {
+  ids: string[];
+}
+
+export interface BulkDeleteExpensesResult {
+  deleted: number;
 }
 
 export interface ListExpensesFilters {
@@ -88,6 +100,24 @@ export interface UpsertBudgetInput {
   limitAmount: number;
 }
 
+export interface PaycheckAnchorDto {
+  operationDate: string;
+  amount: number;
+  title: string;
+}
+
+export interface AccountBalanceDto {
+  balance: number;
+  asOf: string;
+  source: "import" | "manual";
+  updatedAt: string;
+}
+
+export interface UpdateAccountBalanceInput {
+  balance: number;
+  asOf?: Date;
+}
+
 export interface BudgetDashboardDto {
   year: number;
   month: number;
@@ -102,6 +132,11 @@ export interface BudgetDashboardDto {
   avgDailySpend: number;
   projectedOverspend: boolean;
   currency: string;
+  spentSincePaycheck?: number;
+  paycheckAnchor?: PaycheckAnchorDto;
+  accountBalance?: number;
+  accountBalanceAsOf?: string;
+  accountBalanceSource?: "import" | "manual";
 }
 
 export interface CategorySpendItem {

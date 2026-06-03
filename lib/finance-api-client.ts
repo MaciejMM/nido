@@ -1,6 +1,9 @@
 import type {
+  AccountBalanceDto,
   ApiErrorBody,
   BudgetDashboardDto,
+  BulkDeleteExpensesInput,
+  BulkDeleteExpensesResult,
   BulkUpdateExpenseCategoryInput,
   BulkUpdateExpenseCategoryResult,
   CreateCategoryInput,
@@ -17,6 +20,7 @@ import type {
   PushSubscribeInput,
   UpdateExpenseInput,
   UpdateNotificationSettingsInput,
+  UpdateAccountBalanceInput,
   UpsertBudgetInput,
 } from "@/types";
 import { pl } from "@/lib/i18n";
@@ -98,6 +102,17 @@ export async function bulkUpdateExpenseCategory(
   return parseResponse<BulkUpdateExpenseCategoryResult>(response);
 }
 
+export async function bulkDeleteExpenses(
+  input: BulkDeleteExpensesInput,
+): Promise<BulkDeleteExpensesResult> {
+  const response = await fetch("/api/expenses/bulk", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<BulkDeleteExpensesResult>(response);
+}
+
 export async function importExpensesFromCsv(
   file: File,
   year: number,
@@ -165,6 +180,24 @@ export async function upsertBudget(
     body: JSON.stringify(input),
   });
   return parseResponse<MonthlyBudgetDto>(response);
+}
+
+export async function fetchAccountBalance(): Promise<AccountBalanceDto | null> {
+  const response = await fetch("/api/finance/account-balance", {
+    cache: "no-store",
+  });
+  return parseResponse<AccountBalanceDto | null>(response);
+}
+
+export async function updateAccountBalance(
+  input: UpdateAccountBalanceInput,
+): Promise<AccountBalanceDto> {
+  const response = await fetch("/api/finance/account-balance", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseResponse<AccountBalanceDto>(response);
 }
 
 export async function fetchFinanceDashboard(

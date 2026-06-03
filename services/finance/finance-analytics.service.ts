@@ -14,13 +14,13 @@ import {
   getDaysElapsedInMonth,
   getDaysInCalendarMonth,
   getDaysLeftInMonth,
-  getMonthDateRange,
   monthKey,
 } from "@/utils/finance-dates";
-
 import * as budgetService from "./budget.service";
 import * as categoryService from "./category.service";
 import * as expenseService from "./expense.service";
+import * as accountBalanceService from "./account-balance.service";
+import * as paycheckService from "./paycheck.service";
 
 export async function getBudgetDashboard(
   year: number,
@@ -28,19 +28,42 @@ export async function getBudgetDashboard(
   householdId = DEFAULT_HOUSEHOLD_ID,
   today: Date = new Date(),
 ): Promise<BudgetDashboardDto> {
-  const spent = await expenseService.sumExpensesInMonth(year, month, householdId);
   const budget = await budgetService.getBudget(year, month, householdId);
   const limitAmount = budget?.limitAmount ?? 0;
-  const remaining = limitAmount - spent;
   const daysInMonth = getDaysInCalendarMonth(year, month);
-  const daysElapsed = getDaysElapsedInMonth(year, month, today);
   const daysLeft = getDaysLeftInMonth(year, month, today);
-  const dailyAllowance = daysLeft > 0 ? remaining / daysLeft : 0;
-  const avgDailySpend = daysElapsed > 0 ? spent / daysElapsed : 0;
-  const projectedOverspend =
+
+  const [sincePaycheck, accountBalance, calendarSpent] = await Promise.all([
+    paycheckService.getSpentSincePaycheck(year, month, householdId, today),
+    accountBalanceService.getAccountBalance(householdId),
+    expenseService.sumExpensesInMonth(year, month, householdId),
+  ]);
+
+  let spent = calendarSpent;
+  let remaining = limitAmount - spent;
+  let daysElapsed = getDaysElapsedInMonth(year, month, today);
+  let dailyAllowance = daysLeft > 0 ? remaining / daysLeft : 0;
+  let avgDailySpend = daysElapsed > 0 ? spent / daysElapsed : 0;
+  let projectedOverspend =
     limitAmount > 0 && avgDailySpend * daysInMonth > limitAmount;
-  const utilizationPercent =
+  let utilizationPercent =
     limitAmount > 0 ? Math.min(100, (spent / limitAmount) * 100) : 0;
+
+  if (sincePaycheck) {
+    const paycheckMetrics = paycheckService.computePaycheckCycleMetrics(
+      sincePaycheck,
+      limitAmount,
+      daysLeft,
+      today,
+    );
+    spent = paycheckMetrics.spent;
+    remaining = paycheckMetrics.remaining;
+    daysElapsed = paycheckMetrics.daysElapsed;
+    dailyAllowance = paycheckMetrics.dailyAllowance;
+    avgDailySpend = paycheckMetrics.avgDailySpend;
+    projectedOverspend = paycheckMetrics.projectedOverspend;
+    utilizationPercent = paycheckMetrics.utilizationPercent;
+  }
 
   return {
     year,
@@ -56,6 +79,11 @@ export async function getBudgetDashboard(
     avgDailySpend,
     projectedOverspend,
     currency: DEFAULT_CURRENCY,
+    spentSincePaycheck: sincePaycheck?.spent,
+    paycheckAnchor: sincePaycheck?.anchor,
+    accountBalance: accountBalance?.balance,
+    accountBalanceAsOf: accountBalance?.asOf,
+    accountBalanceSource: accountBalance?.source,
   };
 }
 
@@ -63,10 +91,17 @@ export async function getFinanceAnalytics(
   year: number,
   month: number,
   householdId = DEFAULT_HOUSEHOLD_ID,
+  today: Date = new Date(),
 ): Promise<FinanceAnalyticsDto> {
-  const { start, end } = getMonthDateRange(year, month);
+  const expenseMatch = await paycheckService.resolveExpenseMatchForMonth(
+    year,
+    month,
+    householdId,
+    today,
+  );
+
   const [totalSpent, budget] = await Promise.all([
-    expenseService.sumExpensesInMonth(year, month, householdId),
+    paycheckService.sumExpensesForMonthView(year, month, householdId, today),
     budgetService.getBudget(year, month, householdId),
   ]);
   const limitAmount = budget?.limitAmount ?? 0;
@@ -82,7 +117,7 @@ export async function getFinanceAnalytics(
     {
       $match: {
         householdId,
-        date: { $gte: start, $lte: end },
+        ...expenseMatch,
       },
     },
     {
@@ -147,7 +182,12 @@ export async function getFinanceAnalytics(
 
   const monthlyTrend: MonthlySpendItem[] = await Promise.all(
     trendMonths.map(async ({ year: y, month: m }) => {
-      const spent = await expenseService.sumExpensesInMonth(y, m, householdId);
+      const spent = await paycheckService.sumExpensesForMonthView(
+        y,
+        m,
+        householdId,
+        today,
+      );
       const budget = await budgetService.getBudget(y, m, householdId);
       const key = monthKey(y, m);
       const label = format(new Date(y, m - 1, 1), "LLL yy", {
@@ -166,7 +206,7 @@ export async function getFinanceAnalytics(
     {
       $match: {
         householdId,
-        date: { $gte: start, $lte: end },
+        ...expenseMatch,
       },
     },
     {
@@ -199,13 +239,19 @@ export async function getHistoricalMonthlyTotals(
   endYear: number,
   endMonth: number,
   householdId = DEFAULT_HOUSEHOLD_ID,
+  today: Date = new Date(),
 ): Promise<{ year: number; month: number; spent: number }[]> {
   const results: { year: number; month: number; spent: number }[] = [];
   for (let i = monthsBack - 1; i >= 0; i--) {
     const d = new Date(endYear, endMonth - 1 - i, 1);
     const y = d.getFullYear();
     const m = d.getMonth() + 1;
-    const spent = await expenseService.sumExpensesInMonth(y, m, householdId);
+    const spent = await paycheckService.sumExpensesForMonthView(
+      y,
+      m,
+      householdId,
+      today,
+    );
     results.push({ year: y, month: m, spent });
   }
   return results;

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 import { DEFAULT_CURRENCY, DEFAULT_HOUSEHOLD_ID } from "@/lib/finance/constants";
 import {
+  bulkDeleteExpensesSchema,
   bulkUpdateExpenseCategorySchema,
   createExpenseSchema,
   listExpensesQuerySchema,
@@ -11,6 +12,7 @@ import { pl } from "@/lib/i18n";
 import { Expense, type IExpense } from "@/models/Expense";
 import type { IExpenseCategory } from "@/models/ExpenseCategory";
 import type {
+  BulkDeleteExpensesResult,
   BulkUpdateExpenseCategoryResult,
   CreateExpenseInput,
   ExpenseDto,
@@ -18,6 +20,10 @@ import type {
   UpdateExpenseInput,
 } from "@/types";
 import { getMonthDateRange } from "@/utils/finance-dates";
+import {
+  buildExpenseMonthMatch,
+  isCarriedFromPreviousMonth,
+} from "@/utils/finance-month-match";
 import { NotFoundError, ValidationError } from "@/utils/errors";
 
 import * as categoryService from "./category.service";
@@ -25,7 +31,14 @@ import * as categoryService from "./category.service";
 function toExpenseDto(
   expense: IExpense,
   category?: IExpenseCategory,
+  viewYear?: number,
+  viewMonth?: number,
 ): ExpenseDto {
+  const carriedFromPreviousMonth =
+    viewYear !== undefined &&
+    viewMonth !== undefined &&
+    isCarriedFromPreviousMonth(expense, viewYear, viewMonth);
+
   return {
     id: expense._id.toString(),
     amount: expense.amount,
@@ -35,6 +48,9 @@ function toExpenseDto(
     date: expense.date.toISOString(),
     notes: expense.notes,
     currency: expense.currency,
+    attributedYear: expense.attributedYear ?? undefined,
+    attributedMonth: expense.attributedMonth ?? undefined,
+    carriedFromPreviousMonth: carriedFromPreviousMonth || undefined,
     createdAt: expense.createdAt.toISOString(),
     updatedAt: expense.updatedAt.toISOString(),
   };
@@ -56,11 +72,26 @@ function buildListFilter(
     if (filters.dateTo) dateFilter.$lte = filters.dateTo;
     query.date = dateFilter;
   } else if (filters.year && filters.month) {
-    const { start, end } = getMonthDateRange(filters.year, filters.month);
-    query.date = { $gte: start, $lte: end };
+    Object.assign(query, buildExpenseMonthMatch(filters.year, filters.month));
   }
 
   return query;
+}
+
+function sortExpensesForMonthView(
+  expenses: IExpense[],
+  year: number,
+  month: number,
+): IExpense[] {
+  return [...expenses].sort((a, b) => {
+    const aCarried = isCarriedFromPreviousMonth(a, year, month);
+    const bCarried = isCarriedFromPreviousMonth(b, year, month);
+    if (aCarried !== bCarried) return aCarried ? 1 : -1;
+
+    const dateDiff = b.date.getTime() - a.date.getTime();
+    if (dateDiff !== 0) return dateDiff;
+    return b.createdAt.getTime() - a.createdAt.getTime();
+  });
 }
 
 export async function listExpenses(
@@ -77,15 +108,34 @@ export async function listExpenses(
 
   const expenses = await Expense.find(buildListFilter(parsed.data, householdId))
     .populate<{ categoryId: IExpenseCategory }>("categoryId")
-    .sort({ date: -1, createdAt: -1 })
     .exec();
 
-  return expenses.map((expense) => {
+  const viewYear = parsed.data.year;
+  const viewMonth = parsed.data.month;
+  const sorted =
+    viewYear && viewMonth
+      ? sortExpensesForMonthView(
+          expenses as unknown as IExpense[],
+          viewYear,
+          viewMonth,
+        )
+      : [...expenses].sort(
+          (a, b) =>
+            b.date.getTime() - a.date.getTime() ||
+            b.createdAt.getTime() - a.createdAt.getTime(),
+        );
+
+  return sorted.map((expense) => {
     const category =
       expense.categoryId && typeof expense.categoryId === "object"
         ? (expense.categoryId as IExpenseCategory)
         : undefined;
-    return toExpenseDto(expense as unknown as IExpense, category);
+    return toExpenseDto(
+      expense as unknown as IExpense,
+      category,
+      viewYear,
+      viewMonth,
+    );
   });
 }
 
@@ -220,17 +270,40 @@ export async function bulkUpdateExpenseCategory(
   return { updated: result.modifiedCount ?? 0 };
 }
 
+export async function bulkDeleteExpenses(
+  ids: string[],
+  householdId = DEFAULT_HOUSEHOLD_ID,
+): Promise<BulkDeleteExpensesResult> {
+  const parsed = bulkDeleteExpensesSchema.safeParse({ ids });
+  if (!parsed.success) {
+    throw new ValidationError(
+      pl.finance.errors.invalidExpense,
+      parsed.error.flatten(),
+    );
+  }
+
+  const objectIds = parsed.data.ids
+    .filter((id) => Types.ObjectId.isValid(id))
+    .map((id) => new Types.ObjectId(id));
+
+  const result = await Expense.deleteMany({
+    _id: { $in: objectIds },
+    householdId,
+  }).exec();
+
+  return { deleted: result.deletedCount ?? 0 };
+}
+
 export async function sumExpensesInMonth(
   year: number,
   month: number,
   householdId = DEFAULT_HOUSEHOLD_ID,
 ): Promise<number> {
-  const { start, end } = getMonthDateRange(year, month);
   const result = await Expense.aggregate<{ total: number }>([
     {
       $match: {
         householdId,
-        date: { $gte: start, $lte: end },
+        ...buildExpenseMonthMatch(year, month),
       },
     },
     { $group: { _id: null, total: { $sum: "$amount" } } },

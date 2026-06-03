@@ -1,5 +1,8 @@
+import { MIN_PAYCHECK_AMOUNT_PLN } from "@/lib/finance/constants";
 import type { UserRole } from "@/models/User";
 import type { UserDto } from "@/types";
+
+const paycheckThresholdLabel = `≥${MIN_PAYCHECK_AMOUNT_PLN} zł`;
 
 export const pl = {
   app: {
@@ -176,7 +179,13 @@ export const pl = {
     dashboard: {
       title: "Finanse",
       subtitle: "Budżet gospodarstwa domowego",
-      spent: "Wydano",
+      spent: "Wydano w miesiącu",
+      spentSincePaycheck: "Wydano od wynagrodzenia",
+      accountBalance: "Na koncie",
+      accountBalanceAsOf: (date: string) => `Stan na ${date}`,
+      accountBalanceFromImport: "Z ostatniego importu CSV",
+      paycheckSince: (date: string, amount: string) =>
+        `Od wpływu ${amount} (${date})`,
       remaining: "Pozostało",
       limit: "Limit miesięczny",
       dailyAllowance: "Średnio na pozostałe dni",
@@ -217,8 +226,16 @@ export const pl = {
         imported: number,
         duplicates: number,
         outOfMonth: number,
+        carriedFromPrevious: number,
       ) => {
         const parts = [`Zaimportowano ${imported}`];
+        if (carriedFromPrevious > 0) {
+          parts.push(
+            carriedFromPrevious === 1
+              ? `1 z poprzedniego miesiąca (po wpływie ${paycheckThresholdLabel})`
+              : `${carriedFromPrevious} z poprzedniego miesiąca (po wpływie ${paycheckThresholdLabel})`,
+          );
+        }
         if (duplicates > 0) {
           parts.push(`pominięto ${duplicates} duplikatów`);
         }
@@ -227,6 +244,11 @@ export const pl = {
         }
         return parts.join(", ");
       },
+      importCarryoverNote: `Przypisano do bieżącego miesiąca budżetu — operacja z poprzedniego miesiąca po wpływie wynagrodzenia (${paycheckThresholdLabel}).`,
+      carriedFromPreviousSection:
+        "Z poprzedniego miesiąca (po wpływie wynagrodzenia)",
+      carriedFromPreviousHint:
+        "Te wydatki mają datę operacji w poprzednim miesiącu, ale są liczone w wybranym okresie budżetu.",
       importFailed: "Import nie powiódł się",
       importInvalidFile: "Nieobsługiwany plik CSV (oczekiwany format mBank)",
       importNoFile: "Wybierz plik CSV",
@@ -242,6 +264,15 @@ export const pl = {
           : `Zaktualizowano kategorię ${n} wydatków`,
       clearSelection: "Anuluj zaznaczenie",
       bulkSelectCategory: "Wybierz kategorię",
+      bulkDeleteSelected: "Usuń zaznaczone",
+      bulkDeleting: "Usuwanie…",
+      bulkDeleteTitle: "Usunąć zaznaczone wydatki?",
+      bulkDeleteDescription: (n: number) =>
+        n === 1
+          ? "Ten wydatek zostanie trwale usunięty."
+          : `${n} wydatków zostanie trwale usuniętych.`,
+      bulkDeleted: (n: number) =>
+        n === 1 ? "Usunięto 1 wydatek" : `Usunięto ${n} wydatków`,
     },
     personalExpenses: {
       title: "Prywatne wydatki",
@@ -334,6 +365,10 @@ export const pl = {
       title: "Ustawienia finansów",
       budgetLimit: "Limit miesięczny (PLN)",
       budgetSaved: "Limit zapisany",
+      accountBalance: "Saldo na koncie (PLN)",
+      accountBalanceHint:
+        "Ustaw aktualne saldo z banku (np. z aplikacji mBank). Aktualizuje się też przy imporcie CSV.",
+      accountBalanceSaved: "Saldo zapisane",
       categoriesSection: "Kategorie wydatków",
       categoriesHint:
         "Dodawaj kategorie, ikony, kolory i limity miesięczne dla wydatków.",

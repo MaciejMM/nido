@@ -67,12 +67,16 @@ function HomeFinanceSkeleton() {
 
 function HomeFinanceContent({ dashboard }: { dashboard: BudgetDashboardDto }) {
   const hasLimit = dashboard.limitAmount > 0;
+  const hasPaycheckCycle = dashboard.paycheckAnchor !== undefined;
+  const spentLabel = hasPaycheckCycle
+    ? pl.finance.dashboard.spentSincePaycheck
+    : pl.finance.dashboard.spent;
 
   if (!hasLimit) {
     return (
       <div className="space-y-1">
         <p className="text-xs font-medium text-muted-foreground">
-          {pl.finance.dashboard.spent}
+          {spentLabel}
         </p>
         <p className="text-2xl font-semibold tabular-nums">
           {formatCurrency(dashboard.spent, dashboard.currency)}
@@ -94,9 +98,7 @@ function HomeFinanceContent({ dashboard }: { dashboard: BudgetDashboardDto }) {
       </div>
       <div className="min-w-0 flex-1 space-y-2">
         <div>
-          <p className="text-xs text-muted-foreground">
-            {pl.finance.dashboard.spent}
-          </p>
+          <p className="text-xs text-muted-foreground">{spentLabel}</p>
           <p className="text-lg font-semibold tabular-nums">
             {formatCurrency(dashboard.spent, dashboard.currency)}
           </p>
