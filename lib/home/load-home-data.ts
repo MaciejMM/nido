@@ -1,11 +1,14 @@
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+
 import { connectMongo } from "@/lib/db";
-import * as analyticsService from "@/services/finance/finance-analytics.service";
+import { buildHouseholdPlanView } from "@/lib/finance/household-summary";
 import * as entryService from "@/services/entry.service";
+import * as householdPlanService from "@/services/finance/household-plan.service";
 import * as statsService from "@/services/stats.service";
 import * as userService from "@/services/user.service";
 import type {
-  BudgetDashboardDto,
   CustodyEntryDto,
+  HouseholdPlanDto,
   StatsDto,
   UserDto,
 } from "@/types";
@@ -15,7 +18,7 @@ export type HomePageData = {
   month: number;
   stats: StatsDto;
   entries: CustodyEntryDto[];
-  dashboard: BudgetDashboardDto;
+  household: HouseholdPlanDto;
   users: UserDto[];
 };
 
@@ -26,11 +29,26 @@ export async function loadHomePageData(): Promise<HomePageData> {
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
 
-  const [stats, entries, dashboard, users] = await Promise.all([
+  const { isAuthenticated, getUser } = getKindeServerSession();
+  const authed = await isAuthenticated();
+  const user = authed ? await getUser() : null;
+
+  const emptyHousehold = buildHouseholdPlanView({
+    year,
+    month,
+    personalInclusion: "consolidated",
+    incomes: [],
+    expenses: [],
+    personalItems: [],
+  });
+
+  const [stats, entries, users, household] = await Promise.all([
     statsService.getStats({ year }),
     entryService.listEntries({ year }),
-    analyticsService.getBudgetDashboard(year, month),
     userService.getParents(),
+    user?.id
+      ? householdPlanService.getHouseholdPlan(user.id, year, month)
+      : Promise.resolve(emptyHousehold),
   ]);
 
   return {
@@ -38,7 +56,7 @@ export async function loadHomePageData(): Promise<HomePageData> {
     month,
     stats,
     entries: entries.slice(0, 3),
-    dashboard,
+    household,
     users,
   };
 }

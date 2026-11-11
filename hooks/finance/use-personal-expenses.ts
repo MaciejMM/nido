@@ -24,9 +24,14 @@ function invalidatePersonalExpenses(
   year: number,
   month: number,
 ) {
-  return queryClient.invalidateQueries({
-    queryKey: financeKeys.personalExpenses(year, month),
-  });
+  return Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: financeKeys.personalExpenses(year, month),
+    }),
+    queryClient.invalidateQueries({
+      queryKey: financeKeys.household(year, month),
+    }),
+  ]);
 }
 
 export function usePersonalExpenses(year: number, month: number) {

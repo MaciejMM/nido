@@ -9,7 +9,7 @@ export function HomeView({
   month,
   stats,
   entries,
-  dashboard,
+  household,
   users,
 }: HomePageData) {
   return (
@@ -30,7 +30,7 @@ export function HomeView({
         <HomeFinancePreview
           initialYear={year}
           initialMonth={month}
-          initialDashboard={dashboard}
+          initialHousehold={household}
         />
       </div>
     </div>

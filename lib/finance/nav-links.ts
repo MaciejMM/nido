@@ -1,9 +1,9 @@
 import {
   BarChart3Icon,
+  HouseIcon,
   LayoutDashboardIcon,
   ListChecksIcon,
   MoreHorizontalIcon,
-  ReceiptIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -23,9 +23,9 @@ export const financeNavLinks: FinanceNavLink[] = [
     icon: LayoutDashboardIcon,
   },
   {
-    href: "/finance/expenses",
-    label: pl.finance.nav.expenses,
-    icon: ReceiptIcon,
+    href: "/finance/household",
+    label: pl.finance.nav.household,
+    icon: HouseIcon,
   },
   {
     href: "/finance/personal-expenses",
