@@ -7,6 +7,8 @@ import "@/models/TrackingYear";
 import "@/models/ExpenseCategory";
 import "@/models/Expense";
 import "@/models/PersonalExpense";
+import "@/models/HouseholdPlanLine";
+import "@/models/HouseholdPlanSettings";
 import "@/models/MonthlyBudget";
 import "@/models/NotificationSettings";
 import "@/models/PushSubscription";

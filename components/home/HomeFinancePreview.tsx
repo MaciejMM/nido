@@ -3,37 +3,32 @@
 import { WalletIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { BudgetProgressRing } from "@/components/finance/BudgetProgressRing";
 import { HomeOverviewCard } from "@/components/home/HomeOverviewCard";
 import { financeKeys } from "@/hooks/finance/query-keys";
-import { fetchFinanceDashboard } from "@/lib/finance-api-client";
-import {
-  formatCurrency,
-  formatFinanceMonth,
-  formatPercent,
-} from "@/lib/finance/format";
+import { fetchHouseholdPlan } from "@/lib/household-plan-api-client";
+import { formatCurrency, formatFinanceMonth } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import { useFinanceUiStore } from "@/stores/finance-ui.store";
-import type { BudgetDashboardDto } from "@/types";
+import type { HouseholdPlanDto } from "@/types";
 
 interface HomeFinancePreviewProps {
   initialYear: number;
   initialMonth: number;
-  initialDashboard: BudgetDashboardDto;
+  initialHousehold: HouseholdPlanDto;
 }
 
 export function HomeFinancePreview({
   initialYear,
   initialMonth,
-  initialDashboard,
+  initialHousehold,
 }: HomeFinancePreviewProps) {
   const { year, month } = useFinanceUiStore();
   const matchesInitial = year === initialYear && month === initialMonth;
 
-  const { data: dashboard, isLoading } = useQuery({
-    queryKey: financeKeys.dashboard(year, month),
-    queryFn: () => fetchFinanceDashboard(year, month),
-    initialData: matchesInitial ? initialDashboard : undefined,
+  const { data: plan, isLoading } = useQuery({
+    queryKey: financeKeys.household(year, month),
+    queryFn: () => fetchHouseholdPlan(year, month),
+    initialData: matchesInitial ? initialHousehold : undefined,
     staleTime: 30_000,
   });
 
@@ -44,10 +39,10 @@ export function HomeFinancePreview({
       subtitle={formatFinanceMonth(year, month)}
       icon={WalletIcon}
     >
-      {isLoading && !dashboard ? (
+      {isLoading && !plan ? (
         <HomeFinanceSkeleton />
-      ) : dashboard ? (
-        <HomeFinanceContent dashboard={dashboard} />
+      ) : plan ? (
+        <HomeFinanceContent plan={plan} />
       ) : null}
     </HomeOverviewCard>
   );
@@ -55,72 +50,48 @@ export function HomeFinancePreview({
 
 function HomeFinanceSkeleton() {
   return (
-    <div className="flex items-center gap-4" aria-hidden>
-      <div className="size-14 shrink-0 rounded-full bg-muted animate-pulse" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 w-32 rounded bg-muted animate-pulse" />
-        <div className="h-4 w-24 rounded bg-muted animate-pulse" />
-      </div>
+    <div className="space-y-2" aria-hidden>
+      <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+      <div className="h-7 w-32 rounded bg-muted animate-pulse" />
+      <div className="h-4 w-40 rounded bg-muted animate-pulse" />
     </div>
   );
 }
 
-function HomeFinanceContent({ dashboard }: { dashboard: BudgetDashboardDto }) {
-  const hasLimit = dashboard.limitAmount > 0;
-  const hasPaycheckCycle = dashboard.paycheckAnchor !== undefined;
-  const spentLabel = hasPaycheckCycle
-    ? pl.finance.dashboard.spentSincePaycheck
-    : pl.finance.dashboard.spent;
+function HomeFinanceContent({ plan }: { plan: HouseholdPlanDto }) {
+  const { summary } = plan;
+  const hasPlan =
+    summary.incomeCount + summary.expenseCount > 0 || summary.personalExpenses > 0;
+  const savingsClass =
+    summary.savings < 0
+      ? "text-destructive"
+      : summary.savings > 0
+        ? "text-emerald-600 dark:text-emerald-400"
+        : "";
 
-  if (!hasLimit) {
+  if (!hasPlan) {
     return (
-      <div className="space-y-1">
-        <p className="text-xs font-medium text-muted-foreground">
-          {spentLabel}
-        </p>
-        <p className="text-2xl font-semibold tabular-nums">
-          {formatCurrency(dashboard.spent, dashboard.currency)}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {pl.finance.dashboard.noBudget}
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">{pl.finance.household.noPlan}</p>
     );
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="relative flex shrink-0 items-center justify-center">
-        <BudgetProgressRing percent={dashboard.utilizationPercent} size={56} />
-        <span className="absolute text-[10px] font-semibold tabular-nums">
-          {formatPercent(dashboard.utilizationPercent)}
-        </span>
+    <div className="space-y-2">
+      <div>
+        <p className="text-xs text-muted-foreground">
+          {pl.finance.household.savings}
+        </p>
+        <p className={`text-2xl font-semibold tabular-nums ${savingsClass}`}>
+          {formatCurrency(summary.savings, summary.currency)}
+        </p>
       </div>
-      <div className="min-w-0 flex-1 space-y-2">
-        <div>
-          <p className="text-xs text-muted-foreground">{spentLabel}</p>
-          <p className="text-lg font-semibold tabular-nums">
-            {formatCurrency(dashboard.spent, dashboard.currency)}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">
-            {pl.finance.dashboard.remaining}
-          </p>
-          <p
-            className={`text-lg font-semibold tabular-nums ${
-              dashboard.remaining < 0 ? "text-destructive" : ""
-            }`}
-          >
-            {formatCurrency(dashboard.remaining, dashboard.currency)}
-          </p>
-        </div>
-        {dashboard.daysLeft > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {pl.finance.dashboard.daysLeft(dashboard.daysLeft)}
-          </p>
-        )}
-      </div>
+      <p className="text-xs text-muted-foreground">
+        {pl.finance.household.income}:{" "}
+        {formatCurrency(summary.totalIncome, summary.currency)}
+        {" · "}
+        {pl.finance.household.costs}:{" "}
+        {formatCurrency(summary.totalCosts, summary.currency)}
+      </p>
     </div>
   );
 }

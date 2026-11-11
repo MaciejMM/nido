@@ -271,3 +271,79 @@ export interface CopyFromPreviousMonthInput {
 export interface CopyFromPreviousMonthResult {
   copied: number;
 }
+
+export type HouseholdLineKind = "income" | "expense";
+
+export type PersonalInclusionMode = "all" | "consolidated" | "none";
+
+export interface HouseholdLineDto {
+  id: string;
+  year: number;
+  month: number;
+  kind: HouseholdLineKind;
+  title: string;
+  amount: number;
+  notes?: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HouseholdPersonalLine {
+  id: string;
+  title: string;
+  amount: number;
+  source: "personal" | "consolidated";
+}
+
+export interface HouseholdPlanSummary {
+  totalIncome: number;
+  householdExpenses: number;
+  personalExpenses: number;
+  totalCosts: number;
+  savings: number;
+  currency: string;
+  incomeCount: number;
+  expenseCount: number;
+  personalCount: number;
+}
+
+export interface HouseholdPlanDto {
+  year: number;
+  month: number;
+  personalInclusion: PersonalInclusionMode;
+  incomes: HouseholdLineDto[];
+  expenses: HouseholdLineDto[];
+  personalLines: HouseholdPersonalLine[];
+  summary: HouseholdPlanSummary;
+}
+
+export interface CreateHouseholdLineInput {
+  year: number;
+  month: number;
+  kind: HouseholdLineKind;
+  title: string;
+  amount: number;
+  notes?: string;
+}
+
+export interface UpdateHouseholdLineInput {
+  title?: string;
+  amount?: number;
+  notes?: string | null;
+}
+
+export interface UpdateHouseholdSettingsInput {
+  year: number;
+  month: number;
+  personalInclusion: PersonalInclusionMode;
+}
+
+export interface CopyHouseholdPlanInput {
+  year: number;
+  month: number;
+}
+
+export interface CopyHouseholdPlanResult {
+  copied: number;
+}
