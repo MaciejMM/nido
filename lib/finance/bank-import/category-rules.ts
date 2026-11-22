@@ -51,8 +51,12 @@ export const MBANK_CATEGORY_RULES: CategoryRule[] = [
     categoryName: "Zakupy",
   },
   {
-    patterns: [/apteka/i, /specjalistyczna/i],
-    categoryName: "Inne",
+    patterns: [/apteka/i, /specjalistyczna/i, /przychodnia/i, /dentysta/i],
+    categoryName: "Zdrowie",
+  },
+  {
+    patterns: [/ikea/i, /leroy merlin/i, /castorama/i, /obi\b/i],
+    categoryName: "Dom",
   },
 ];
 
