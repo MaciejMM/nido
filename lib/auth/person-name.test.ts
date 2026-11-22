@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { kindeDisplayName, personLabel } from "./person-name";
+import { kindeDisplayName, personLabel, soleRemainingName } from "./person-name";
 
 describe("personLabel", () => {
   it("keeps a real name", () => {
@@ -40,5 +40,15 @@ describe("kindeDisplayName", () => {
         email: "maciej.myslinski88@gmail.com",
       }),
     ).toBe("Maciej");
+  });
+});
+
+describe("soleRemainingName", () => {
+  it("uses the one parent name that is not already shown", () => {
+    expect(soleRemainingName(["Maciej"], ["Maciej", "Zuza"])).toBe("Zuza");
+  });
+
+  it("does not guess when more than one name is unused", () => {
+    expect(soleRemainingName(["Maciej"], ["Zuza", "Anna"])).toBeUndefined();
   });
 });

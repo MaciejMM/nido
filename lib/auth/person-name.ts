@@ -27,6 +27,33 @@ export function personLabel(
   return text;
 }
 
+function nameKey(value: string): string {
+  return value.toLocaleLowerCase("pl");
+}
+
+/** The one candidate name that is not already used. */
+export function soleRemainingName(
+  usedNames: Iterable<string | undefined>,
+  candidates: Iterable<string | undefined>,
+): string | undefined {
+  const used = new Set(
+    [...usedNames]
+      .map((name) => personLabel(name))
+      .filter((name): name is string => Boolean(name))
+      .map(nameKey),
+  );
+  const remaining: string[] = [];
+  for (const candidate of candidates) {
+    const name = personLabel(candidate);
+    if (!name) continue;
+    const key = nameKey(name);
+    if (used.has(key)) continue;
+    if (remaining.some((item) => nameKey(item) === key)) continue;
+    remaining.push(name);
+  }
+  return remaining.length === 1 ? remaining[0] : undefined;
+}
+
 function realName(value: string | null | undefined): string | undefined {
   const text = clean(value);
   if (!text || isEmail(text)) return undefined;

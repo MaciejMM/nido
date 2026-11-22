@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-import { personLabel } from "@/lib/auth/person-name";
+import { personLabel, soleRemainingName } from "@/lib/auth/person-name";
 import { DEFAULT_CURRENCY, DEFAULT_HOUSEHOLD_ID } from "@/lib/finance/constants";
 import { categoryObjectId, readStoredCategory } from "@/lib/finance/read-category";
 import {
@@ -20,6 +20,7 @@ import {
   type IHouseholdPlanLine,
 } from "@/models/HouseholdPlanLine";
 import { HouseholdMember } from "@/models/HouseholdMember";
+import { User } from "@/models/User";
 import { HouseholdPlanSettings } from "@/models/HouseholdPlanSettings";
 import { PersonalExpense } from "@/models/PersonalExpense";
 import type {
@@ -199,6 +200,25 @@ export async function getHouseholdPlan(
     ]),
   );
   const viewerName = personLabel(displayName) || storedNames.get(kindeUserId);
+  const unnamedIds = ownerIds.filter(
+    (ownerId) =>
+      ownerLabel(ownerId, kindeUserId, viewerName, storedNames) ===
+      pl.finance.household.otherPerson,
+  );
+  if (unnamedIds.length === 1) {
+    const [unnamedId] = unnamedIds;
+    const parents = await User.find().select("name").lean();
+    const knownNames = ownerIds
+      .filter((ownerId) => ownerId !== unnamedId)
+      .map((ownerId) =>
+        ownerLabel(ownerId, kindeUserId, viewerName, storedNames),
+      );
+    const parentName = soleRemainingName(knownNames, parents.map((parent) => parent.name));
+    if (parentName) {
+      storedNames.set(unnamedId, parentName);
+      await rememberMember(unnamedId, parentName);
+    }
+  }
 
   const [lineCategories, personalCategories] = await Promise.all([
     categoriesForLines(lines),
