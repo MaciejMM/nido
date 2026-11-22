@@ -9,6 +9,7 @@ import "@/models/Expense";
 import "@/models/PersonalExpense";
 import "@/models/HouseholdPlanLine";
 import "@/models/HouseholdPlanSettings";
+import "@/models/HouseholdMember";
 import "@/models/MonthlyBudget";
 import "@/models/NotificationSettings";
 import "@/models/PushSubscription";

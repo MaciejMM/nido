@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { CategoryMark } from "@/components/finance/CategoryMark";
 import { formatCurrency } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import type { HouseholdPersonalLine } from "@/types";
@@ -43,14 +44,21 @@ export function HouseholdPersonalLines({
           >
             <div className="min-w-0">
               <p className="truncate font-medium">
-                {line.source === "consolidated"
-                  ? pl.finance.household.consolidatedTitle
-                  : line.title}
+                {line.title ||
+                  (line.source === "consolidated"
+                    ? pl.finance.household.consolidatedTitle
+                    : line.title)}
               </p>
               {line.source === "consolidated" ? (
                 <p className="text-xs text-muted-foreground">
                   {pl.finance.household.consolidatedCount(personalCount)}
                 </p>
+              ) : line.categoryName ? (
+                <CategoryMark
+                  name={line.categoryName}
+                  icon={line.categoryIcon ?? "Tag"}
+                  color={line.categoryColor ?? "currentColor"}
+                />
               ) : null}
             </div>
             <p className="shrink-0 text-sm font-medium tabular-nums">

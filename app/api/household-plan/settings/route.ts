@@ -18,6 +18,7 @@ export async function PATCH(request: NextRequest) {
     const plan = await householdPlanService.updateHouseholdSettings(
       auth.kindeUserId,
       body,
+      auth.displayName,
     );
     return NextResponse.json(plan);
   } catch (error) {

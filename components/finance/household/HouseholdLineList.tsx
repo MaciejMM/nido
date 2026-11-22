@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CategoryMark } from "@/components/finance/CategoryMark";
 import { formatCurrency } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import type { HouseholdLineDto } from "@/types";
@@ -84,6 +85,13 @@ export function HouseholdLineList({
           >
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{item.title}</p>
+              {item.category ? (
+                <CategoryMark
+                  name={item.category.name}
+                  icon={item.category.icon}
+                  color={item.category.color}
+                />
+              ) : null}
               <p className="text-sm tabular-nums text-muted-foreground">
                 {formatCurrency(item.amount, currency)}
               </p>

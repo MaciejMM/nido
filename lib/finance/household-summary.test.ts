@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { HouseholdLineDto } from "@/types";
+import type { HouseholdPersonalSource } from "./household-summary";
 
 import { buildHouseholdPlanView } from "./household-summary";
 
@@ -38,6 +39,15 @@ const personal = [
   { id: "p2", title: "Lunch", amount: 400 },
 ];
 
+function owner(
+  ownerId: string,
+  label: string,
+  personalInclusion: "all" | "consolidated" | "none",
+  items: HouseholdPersonalSource[],
+) {
+  return { ownerId, label, personalInclusion, items };
+}
+
 describe("buildHouseholdPlanView", () => {
   it("keeps each private expense when inclusion is all", () => {
     const view = buildHouseholdPlanView({
@@ -46,9 +56,20 @@ describe("buildHouseholdPlanView", () => {
       personalInclusion: "all",
       incomes,
       expenses,
-      personalItems: personal,
+      personalOwners: [owner("maciej", "Maciej", "all", personal)],
     });
 
+    expect(view.personalGroups).toEqual([
+      {
+        id: "maciej",
+        label: "Maciej",
+        total: 550,
+        lines: [
+          { id: "p1", title: "Siłownia", amount: 150, source: "personal" },
+          { id: "p2", title: "Lunch", amount: 400, source: "personal" },
+        ],
+      },
+    ]);
     expect(view.personalLines).toEqual([
       { id: "p1", title: "Siłownia", amount: 150, source: "personal" },
       { id: "p2", title: "Lunch", amount: 400, source: "personal" },
@@ -69,13 +90,28 @@ describe("buildHouseholdPlanView", () => {
       personalInclusion: "consolidated",
       incomes,
       expenses,
-      personalItems: personal,
+      personalOwners: [owner("maciej", "Maciej", "consolidated", personal)],
     });
 
+    expect(view.personalGroups).toEqual([
+      {
+        id: "maciej",
+        label: "Maciej",
+        total: 550,
+        lines: [
+          {
+            id: "personal-maciej",
+            title: "Maciej",
+            amount: 550,
+            source: "consolidated",
+          },
+        ],
+      },
+    ]);
     expect(view.personalLines).toEqual([
       {
-        id: "personal-consolidated",
-        title: "",
+        id: "personal-maciej",
+        title: "Maciej",
         amount: 550,
         source: "consolidated",
       },
@@ -91,7 +127,7 @@ describe("buildHouseholdPlanView", () => {
       personalInclusion: "none",
       incomes,
       expenses,
-      personalItems: personal,
+      personalOwners: [owner("maciej", "Maciej", "none", personal)],
     });
 
     expect(view.personalLines).toEqual([]);
@@ -108,9 +144,62 @@ describe("buildHouseholdPlanView", () => {
       personalInclusion: "none",
       incomes: [line("a", "income", "Wynagrodzenie", 1000)],
       expenses: [line("c", "expense", "Czynsz", 3000)],
-      personalItems: [],
+      personalOwners: [],
     });
 
     expect(view.summary.savings).toBe(-2000);
+  });
+
+  it("keeps each person's private expenses as a separate position", () => {
+    const view = buildHouseholdPlanView({
+      year: 2026,
+      month: 11,
+      personalInclusion: "consolidated",
+      incomes,
+      expenses,
+      personalOwners: [
+        owner("maciej", "Maciej", "consolidated", personal),
+        owner("zuza", "Zuza", "all", [
+          { id: "z1", title: "Siłownia", amount: 200 },
+        ]),
+      ],
+    });
+
+    expect(view.personalGroups.map((group) => group.label)).toEqual([
+      "Maciej",
+      "Zuza",
+    ]);
+    expect(view.summary.personalExpenses).toBe(750);
+    expect(view.summary.totalCosts).toBe(4250);
+    expect(view.summary.savings).toBe(9750);
+  });
+
+  it("keeps a category on individual private lines", () => {
+    const view = buildHouseholdPlanView({
+      year: 2026,
+      month: 11,
+      personalInclusion: "all",
+      incomes,
+      expenses,
+      personalOwners: [
+        owner("maciej", "Maciej", "all", [
+          {
+            id: "p1",
+            title: "Siłownia",
+            amount: 150,
+            categoryName: "Zdrowie",
+            categoryIcon: "Tag",
+            categoryColor: "#16a34a",
+          },
+        ]),
+      ],
+    });
+
+    expect(view.personalGroups[0]?.lines[0]).toMatchObject({
+      title: "Siłownia",
+      categoryName: "Zdrowie",
+      categoryIcon: "Tag",
+      categoryColor: "#16a34a",
+    });
   });
 });

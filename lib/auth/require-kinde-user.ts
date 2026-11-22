@@ -1,9 +1,14 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 
+import { kindeDisplayName } from "@/lib/auth/person-name";
+
 export type KindeUserContext = {
   kindeUserId: string;
+  displayName?: string;
 };
+
+export { kindeDisplayName };
 
 export async function requireKindeUser(): Promise<
   KindeUserContext | NextResponse
@@ -19,7 +24,7 @@ export async function requireKindeUser(): Promise<
     return NextResponse.json({ error: "Brak autoryzacji" }, { status: 401 });
   }
 
-  return { kindeUserId: user.id };
+  return { kindeUserId: user.id, displayName: kindeDisplayName(user) };
 }
 
 export function isKindeUserContext(

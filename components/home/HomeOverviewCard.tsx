@@ -11,6 +11,7 @@ interface HomeOverviewCardProps {
   icon: LucideIcon;
   children: React.ReactNode;
   className?: string;
+  interactiveContent?: boolean;
 }
 
 export function HomeOverviewCard({
@@ -20,27 +21,46 @@ export function HomeOverviewCard({
   icon: Icon,
   children,
   className,
+  interactiveContent = false,
 }: HomeOverviewCardProps) {
+  const header = (
+    <CardHeader className="pb-3">
+      <div className="flex items-start gap-3">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon className="size-4" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <CardTitle className="text-base font-semibold">{title}</CardTitle>
+          {subtitle ? (
+            <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+          ) : null}
+        </div>
+        <ChevronRightIcon
+          className="size-5 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+          aria-hidden
+        />
+      </div>
+    </CardHeader>
+  );
+
+  const cardClass =
+    "rounded-xl border-border/80 transition-colors hover:border-border hover:bg-accent/20 active:bg-accent/30";
+
+  if (interactiveContent) {
+    return (
+      <Card className={cn(cardClass, className)}>
+        <Link href={href} className="group block">
+          {header}
+        </Link>
+        <CardContent className="pt-0">{children}</CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Link href={href} className={cn("group block", className)}>
-      <Card className="rounded-xl border-border/80 transition-colors hover:border-border hover:bg-accent/20 active:bg-accent/30">
-        <CardHeader className="pb-3">
-          <div className="flex items-start gap-3">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Icon className="size-4" aria-hidden />
-            </div>
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-base font-semibold">{title}</CardTitle>
-              {subtitle ? (
-                <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
-              ) : null}
-            </div>
-            <ChevronRightIcon
-              className="size-5 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground"
-              aria-hidden
-            />
-          </div>
-        </CardHeader>
+      <Card className={cardClass}>
+        {header}
         <CardContent className="pt-0">{children}</CardContent>
       </Card>
     </Link>

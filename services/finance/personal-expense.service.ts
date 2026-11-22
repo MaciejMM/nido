@@ -1,4 +1,5 @@
 import { DEFAULT_CURRENCY } from "@/lib/finance/constants";
+import { categoryObjectId, readStoredCategory } from "@/lib/finance/read-category";
 import { pl } from "@/lib/i18n";
 import {
   copyFromPreviousMonthSchema,
@@ -23,8 +24,17 @@ import type {
 } from "@/types";
 import { getPreviousMonth } from "@/utils/finance-dates";
 import { ConflictError, NotFoundError, ValidationError } from "@/utils/errors";
+import * as categoryService from "@/services/finance/category.service";
 
-function toPersonalExpenseDto(expense: IPersonalExpense): PersonalExpenseDto {
+function toPersonalExpenseDto(
+  expense: IPersonalExpense,
+  categories?: Map<string, PersonalExpenseDto["category"]>,
+): PersonalExpenseDto {
+  const stored = readStoredCategory(expense.categoryId);
+  const category =
+    stored.category ??
+    (stored.categoryId ? categories?.get(stored.categoryId) : undefined);
+
   return {
     id: expense._id.toString(),
     year: expense.year,
@@ -37,9 +47,34 @@ function toPersonalExpenseDto(expense: IPersonalExpense): PersonalExpenseDto {
     notes: expense.notes,
     sortOrder: expense.sortOrder,
     visibility: expense.visibility,
+    ...(stored.categoryId ? { categoryId: stored.categoryId } : {}),
+    ...(category ? { category } : {}),
     createdAt: expense.createdAt.toISOString(),
     updatedAt: expense.updatedAt.toISOString(),
   };
+}
+
+async function categoriesFor(
+  expenses: IPersonalExpense[],
+): Promise<Map<string, PersonalExpenseDto["category"]>> {
+  return categoryService.loadCategoriesByIds(
+    expenses.flatMap((expense) => {
+      const categoryId = readStoredCategory(expense.categoryId).categoryId;
+      return categoryId ? [categoryId] : [];
+    }),
+  );
+}
+
+async function assignCategory(
+  expense: IPersonalExpense,
+  categoryId: string | null,
+): Promise<void> {
+  if (!categoryId) {
+    expense.set("categoryId", undefined);
+    return;
+  }
+
+  expense.categoryId = await categoryService.requireCategoryObjectId(categoryId);
 }
 
 function buildSummary(
@@ -102,10 +137,14 @@ export async function listPersonalExpenses(
     month: parsed.data.month,
     visibility: "private",
   })
+    .populate("categoryId")
     .sort({ sortOrder: 1, createdAt: 1 })
     .exec();
 
-  const items = sortItems(expenses.map(toPersonalExpenseDto));
+  const categories = await categoriesFor(expenses);
+  const items = sortItems(
+    expenses.map((expense) => toPersonalExpenseDto(expense, categories)),
+  );
   const currency = items[0]?.currency ?? DEFAULT_CURRENCY;
 
   return {
@@ -146,9 +185,17 @@ export async function createPersonalExpense(
     notes: parsed.data.notes,
     visibility: parsed.data.visibility ?? "private",
     sortOrder: (maxSort?.sortOrder ?? -1) + 1,
+    ...(parsed.data.categoryId
+      ? {
+          categoryId: await categoryService.requireCategoryObjectId(
+            parsed.data.categoryId,
+          ),
+        }
+      : {}),
   });
 
-  return toPersonalExpenseDto(expense);
+  const categories = await categoriesFor([expense]);
+  return toPersonalExpenseDto(expense, categories);
 }
 
 export async function updatePersonalExpense(
@@ -174,9 +221,13 @@ export async function updatePersonalExpense(
   if (parsed.data.visibility !== undefined) {
     expense.visibility = parsed.data.visibility;
   }
+  if (parsed.data.categoryId !== undefined) {
+    await assignCategory(expense, parsed.data.categoryId);
+  }
 
   await expense.save();
-  return toPersonalExpenseDto(expense);
+  const categories = await categoriesFor([expense]);
+  return toPersonalExpenseDto(expense, categories);
 }
 
 export async function patchPersonalExpense(
@@ -205,7 +256,8 @@ export async function patchPersonalExpense(
   }
 
   await expense.save();
-  return toPersonalExpenseDto(expense);
+  const categories = await categoriesFor([expense]);
+  return toPersonalExpenseDto(expense, categories);
 }
 
 export async function deletePersonalExpense(
@@ -276,19 +328,23 @@ export async function copyFromPreviousMonth(
   }
 
   await PersonalExpense.insertMany(
-    itemsToCopy.map((item, index) => ({
-      kindeUserId,
-      year,
-      month,
-      title: item.title,
-      amount: item.amount,
-      currency: item.currency,
-      isPaid: false,
-      paidAt: undefined,
-      notes: item.notes,
-      sortOrder: index,
-      visibility: "private" as const,
-    })),
+    itemsToCopy.map((item, index) => {
+      const categoryId = categoryObjectId(item.categoryId);
+      return {
+        kindeUserId,
+        year,
+        month,
+        title: item.title,
+        amount: item.amount,
+        currency: item.currency,
+        isPaid: false,
+        paidAt: undefined,
+        notes: item.notes,
+        sortOrder: index,
+        visibility: "private" as const,
+        ...(categoryId ? { categoryId } : {}),
+      };
+    }),
   );
 
   return { copied: itemsToCopy.length };

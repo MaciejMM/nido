@@ -1,6 +1,7 @@
 import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
+import { kindeDisplayName } from "@/lib/auth/person-name";
 import { buttonVariants } from "@/components/ui/button";
 import { pl } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -21,10 +22,7 @@ export async function AuthActions() {
   }
 
   const user = await getUser();
-  const displayName =
-    [user?.given_name, user?.family_name].filter(Boolean).join(" ") ||
-    user?.email ||
-    pl.auth.signedInUser;
+  const displayName = kindeDisplayName(user) || pl.auth.signedInUser;
 
   return (
     <div className="flex items-center gap-2">

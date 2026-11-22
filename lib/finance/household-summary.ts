@@ -1,6 +1,7 @@
 import { DEFAULT_CURRENCY } from "@/lib/finance/constants";
 import type {
   HouseholdLineDto,
+  HouseholdPersonalGroup,
   HouseholdPersonalLine,
   HouseholdPlanDto,
   HouseholdPlanSummary,
@@ -11,6 +12,16 @@ export interface HouseholdPersonalSource {
   id: string;
   title: string;
   amount: number;
+  categoryName?: string;
+  categoryIcon?: string;
+  categoryColor?: string;
+}
+
+export interface HouseholdPersonalOwner {
+  ownerId: string;
+  label: string;
+  personalInclusion: PersonalInclusionMode;
+  items: HouseholdPersonalSource[];
 }
 
 function sumAmounts(items: { amount: number }[]): number {
@@ -23,21 +34,22 @@ export function buildHouseholdPlanView(input: {
   personalInclusion: PersonalInclusionMode;
   incomes: HouseholdLineDto[];
   expenses: HouseholdLineDto[];
-  personalItems: HouseholdPersonalSource[];
+  personalOwners: HouseholdPersonalOwner[];
   currency?: string;
 }): HouseholdPlanDto {
   const currency = input.currency ?? DEFAULT_CURRENCY;
   const totalIncome = sumAmounts(input.incomes);
   const householdExpenses = sumAmounts(input.expenses);
-  const personalTotal = sumAmounts(input.personalItems);
-  const includePersonal = input.personalInclusion !== "none";
-  const personalExpenses = includePersonal ? personalTotal : 0;
+  const personalGroups = groupsForOwners(input.personalOwners);
+  const personalExpenses = personalGroups.reduce(
+    (total, group) => total + group.total,
+    0,
+  );
   const totalCosts = householdExpenses + personalExpenses;
-
-  const personalLines = personalLinesForMode(
-    input.personalInclusion,
-    input.personalItems,
-    personalTotal,
+  const personalLines = personalGroups.flatMap((group) =>
+    group.lines.map((line) =>
+      line.source === "consolidated" ? { ...line, title: group.label } : line,
+    ),
   );
 
   const summary: HouseholdPlanSummary = {
@@ -49,7 +61,10 @@ export function buildHouseholdPlanView(input: {
     currency,
     incomeCount: input.incomes.length,
     expenseCount: input.expenses.length,
-    personalCount: input.personalItems.length,
+    personalCount: input.personalOwners.reduce(
+      (count, owner) => count + owner.items.length,
+      0,
+    ),
   };
 
   return {
@@ -58,9 +73,38 @@ export function buildHouseholdPlanView(input: {
     personalInclusion: input.personalInclusion,
     incomes: input.incomes,
     expenses: input.expenses,
+    personalGroups,
     personalLines,
     summary,
   };
+}
+
+function groupsForOwners(
+  owners: HouseholdPersonalOwner[],
+): HouseholdPersonalGroup[] {
+  return owners.flatMap((owner) => {
+    const personalTotal = sumAmounts(owner.items);
+    const lines = personalLinesForMode(
+      owner.personalInclusion,
+      owner.items,
+      personalTotal,
+    ).map((line) =>
+      line.source === "consolidated"
+        ? { ...line, id: `personal-${owner.ownerId}`, title: owner.label }
+        : line,
+    );
+
+    if (lines.length === 0) return [];
+
+    return [
+      {
+        id: owner.ownerId,
+        label: owner.label,
+        lines,
+        total: personalTotal,
+      },
+    ];
+  });
 }
 
 function personalLinesForMode(
@@ -86,5 +130,12 @@ function personalLinesForMode(
     title: item.title,
     amount: item.amount,
     source: "personal" as const,
+    ...(item.categoryName
+      ? {
+          categoryName: item.categoryName,
+          categoryIcon: item.categoryIcon,
+          categoryColor: item.categoryColor,
+        }
+      : {}),
   }));
 }

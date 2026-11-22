@@ -4,6 +4,7 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { CategoryMark } from "@/components/finance/CategoryMark";
 import { formatCurrency } from "@/lib/finance/format";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -108,6 +109,13 @@ export function PersonalExpenseList({
                 >
                   {item.title}
                 </p>
+                {item.category ? (
+                  <CategoryMark
+                    name={item.category.name}
+                    icon={item.category.icon}
+                    color={item.category.color}
+                  />
+                ) : null}
                 {item.notes && (
                   <p className="truncate text-xs text-muted-foreground">
                     {item.notes}

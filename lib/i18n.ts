@@ -145,6 +145,7 @@ export const pl = {
     updated: "Wpis zaktualizowany",
     dateRange: "Okres opieki",
     pickDateRange: "Wybierz zakres dat w kalendarzu",
+    pickRangeHint: "Kliknij dzień rozpoczęcia, potem dzień zakończenia.",
     weekdaysCount: (count: number) =>
       count === 1 ? "1 dzień roboczy" : `${count} dni roboczych`,
     weekdaysBadge: (count: number) =>
@@ -206,6 +207,7 @@ export const pl = {
       amount: "Kwota",
       titleLabel: "Tytuł",
       category: "Kategoria",
+      noCategory: "Bez kategorii",
       date: "Data",
       notes: "Notatki (opcjonalnie)",
       deleteTitle: "Usunąć wydatek?",
@@ -293,7 +295,9 @@ export const pl = {
       emptyExpensesHint: "Dodaj planowane koszty gospodarstwa",
       personalSection: "Prywatne wydatki",
       personalHint:
-        "Wybierz, jak pozycje z listy prywatnej wchodzą do kosztów miesiąca.",
+        "Każda osoba ma osobną pozycję. Ten wybór dotyczy Twoich prywatnych wydatków.",
+      you: "Ty",
+      otherPerson: "Druga osoba",
       inclusionAll: "Wszystkie pozycje",
       inclusionConsolidated: "Jedna pozycja",
       inclusionNone: "Nie wliczaj",
@@ -424,13 +428,10 @@ export const pl = {
     },
     analytics: {
       title: "Analityka",
-      monthly: "Wydatki miesięczne",
-      byCategory: "Według kategorii",
-      categoryLimits: "Wykorzystanie limitów",
-      totalAvailable: "Łącznie dostępne",
-      budgetOverspend: "Przekroczenie budżetu",
+      subtitle:
+        "Te same przychody, koszty domu, prywatne wydatki i oszczędności co w planie domu.",
+      structure: "Struktura miesiąca",
       trend: "Trend (6 mies.)",
-      daily: "Wydatki dzienne",
       noData: "Brak danych do wykresu",
     },
     settings: {
@@ -443,7 +444,7 @@ export const pl = {
       accountBalanceSaved: "Saldo zapisane",
       categoriesSection: "Kategorie wydatków",
       categoriesHint:
-        "Dodawaj kategorie, ikony, kolory i limity miesięczne dla wydatków.",
+        "Dodawaj kategorie, ikony, kolory i limity. Przypisujesz je do wydatków prywatnych i wydatków w planie.",
       manageCategories: "Zarządzaj kategoriami",
       categoriesCount: (n: number) =>
         n === 1 ? "1 kategoria" : n < 5 ? `${n} kategorie` : `${n} kategorii`,
