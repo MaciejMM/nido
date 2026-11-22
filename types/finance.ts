@@ -221,6 +221,8 @@ export interface PersonalExpenseDto {
   notes?: string;
   sortOrder: number;
   visibility: PersonalExpenseVisibility;
+  categoryId?: string;
+  category?: ExpenseCategoryDto;
   createdAt: string;
   updatedAt: string;
 }
@@ -246,6 +248,7 @@ export interface CreatePersonalExpenseInput {
   amount: number;
   notes?: string;
   visibility?: PersonalExpenseVisibility;
+  categoryId?: string | null;
 }
 
 export interface UpdatePersonalExpenseInput {
@@ -253,6 +256,7 @@ export interface UpdatePersonalExpenseInput {
   amount?: number;
   notes?: string | null;
   visibility?: PersonalExpenseVisibility;
+  categoryId?: string | null;
 }
 
 export interface PatchPersonalExpenseInput {
@@ -285,6 +289,8 @@ export interface HouseholdLineDto {
   amount: number;
   notes?: string;
   sortOrder: number;
+  categoryId?: string;
+  category?: ExpenseCategoryDto;
   createdAt: string;
   updatedAt: string;
 }
@@ -294,6 +300,16 @@ export interface HouseholdPersonalLine {
   title: string;
   amount: number;
   source: "personal" | "consolidated";
+  categoryName?: string;
+  categoryIcon?: string;
+  categoryColor?: string;
+}
+
+export interface HouseholdPersonalGroup {
+  id: string;
+  label: string;
+  lines: HouseholdPersonalLine[];
+  total: number;
 }
 
 export interface HouseholdPlanSummary {
@@ -314,6 +330,7 @@ export interface HouseholdPlanDto {
   personalInclusion: PersonalInclusionMode;
   incomes: HouseholdLineDto[];
   expenses: HouseholdLineDto[];
+  personalGroups: HouseholdPersonalGroup[];
   personalLines: HouseholdPersonalLine[];
   summary: HouseholdPlanSummary;
 }
@@ -325,12 +342,14 @@ export interface CreateHouseholdLineInput {
   title: string;
   amount: number;
   notes?: string;
+  categoryId?: string | null;
 }
 
 export interface UpdateHouseholdLineInput {
   title?: string;
   amount?: number;
   notes?: string | null;
+  categoryId?: string | null;
 }
 
 export interface UpdateHouseholdSettingsInput {

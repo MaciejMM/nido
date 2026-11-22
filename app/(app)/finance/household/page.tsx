@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { CopyHouseholdPlanButton } from "@/components/finance/household/CopyHouseholdPlanButton";
 import { HouseholdLineForm } from "@/components/finance/household/HouseholdLineForm";
 import { HouseholdLineList } from "@/components/finance/household/HouseholdLineList";
-import { HouseholdPersonalLines } from "@/components/finance/household/HouseholdPersonalLines";
+import { PersonalCostDisclosure } from "@/components/finance/household/PersonalCostDisclosure";
 import { HouseholdSummaryCards } from "@/components/finance/household/HouseholdSummaryCards";
 import { PersonalInclusionControl } from "@/components/finance/household/PersonalInclusionControl";
 import { FinanceMonthSwitcher } from "@/components/finance/FinanceMonthSwitcher";
@@ -169,20 +169,17 @@ export default function HouseholdPlanPage() {
             });
           }}
         />
-        {plan && plan.personalInclusion !== "none" ? (
-          <HouseholdPersonalLines
-            lines={plan.personalLines}
-            personalCount={plan.summary.personalCount}
-            currency={currency}
-          />
-        ) : (
-          <Link
-            href="/finance/personal-expenses"
-            className="inline-block text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
-          >
-            {pl.finance.household.openPersonal}
-          </Link>
-        )}
+        <PersonalCostDisclosure
+          groups={plan?.personalGroups ?? []}
+          currency={currency}
+          framed
+        />
+        <Link
+          href="/finance/personal-expenses"
+          className="inline-block text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
+        >
+          {pl.finance.household.openPersonal}
+        </Link>
       </section>
 
       <HouseholdLineForm

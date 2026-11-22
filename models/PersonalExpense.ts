@@ -1,4 +1,6 @@
-import mongoose, { type Document, Schema } from "mongoose";
+import mongoose, { type Document, Schema, Types } from "mongoose";
+
+import type { IExpenseCategory } from "@/models/ExpenseCategory";
 
 export type PersonalExpenseVisibility = "private" | "shared";
 
@@ -14,6 +16,7 @@ export interface IPersonalExpense extends Document {
   notes?: string;
   sortOrder: number;
   visibility: PersonalExpenseVisibility;
+  categoryId?: Types.ObjectId | IExpenseCategory | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,12 +38,21 @@ const personalExpenseSchema = new Schema<IPersonalExpense>(
       enum: ["private", "shared"],
       default: "private",
     },
+    categoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "ExpenseCategory",
+    },
   },
   { timestamps: true },
 );
 
 personalExpenseSchema.index({ kindeUserId: 1, year: 1, month: 1 });
 
-export const PersonalExpense =
-  mongoose.models.PersonalExpense ??
-  mongoose.model<IPersonalExpense>("PersonalExpense", personalExpenseSchema);
+if (mongoose.models.PersonalExpense) {
+  mongoose.deleteModel("PersonalExpense");
+}
+
+export const PersonalExpense = mongoose.model<IPersonalExpense>(
+  "PersonalExpense",
+  personalExpenseSchema,
+);

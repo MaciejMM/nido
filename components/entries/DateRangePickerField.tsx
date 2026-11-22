@@ -41,6 +41,9 @@ export function DateRangePickerField({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label className="text-muted-foreground">{pl.entries.dateRange}</Label>
+        <p className="text-sm leading-snug text-foreground/80">
+          {pl.entries.pickRangeHint}
+        </p>
         <div className="rounded-xl border border-border bg-muted/40 px-3.5 py-3">
           <p
             className={cn(
@@ -74,10 +77,7 @@ export function DateRangePickerField({
         numberOfMonths={1}
         defaultMonth={startDate ?? endDate}
         modifiers={{ weekend: isWeekendLocal }}
-        modifiersClassNames={{
-          weekend: "opacity-50",
-        }}
-        className="rounded-xl border border-border bg-card [--cell-size:calc((100%-1.5rem)/7)]"
+        className="rounded-xl border border-border bg-card [--cell-size:2.75rem]"
       />
     </div>
   );

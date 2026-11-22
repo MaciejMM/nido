@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const amountSchema = z.coerce.number().min(0);
+const optionalCategoryIdSchema = z.string().trim().min(1).nullable().optional();
 
 const monthSchema = z.coerce.number().int().min(1).max(12);
 const yearSchema = z.coerce.number().int().min(2000).max(2100);
@@ -17,6 +18,7 @@ export const createPersonalExpenseSchema = z.object({
   amount: amountSchema,
   notes: z.string().trim().max(1000).optional(),
   visibility: z.enum(["private", "shared"]).optional(),
+  categoryId: optionalCategoryIdSchema,
 });
 
 export const updatePersonalExpenseSchema = z.object({
@@ -24,6 +26,7 @@ export const updatePersonalExpenseSchema = z.object({
   amount: amountSchema.optional(),
   notes: z.string().trim().max(1000).optional().nullable(),
   visibility: z.enum(["private", "shared"]).optional(),
+  categoryId: optionalCategoryIdSchema,
 });
 
 export const patchPersonalExpenseSchema = z.object({

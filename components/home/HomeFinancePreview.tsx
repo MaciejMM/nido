@@ -3,6 +3,7 @@
 import { WalletIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
+import { PersonalCostDisclosure } from "@/components/finance/household/PersonalCostDisclosure";
 import { HomeOverviewCard } from "@/components/home/HomeOverviewCard";
 import { financeKeys } from "@/hooks/finance/query-keys";
 import { fetchHouseholdPlan } from "@/lib/household-plan-api-client";
@@ -38,6 +39,7 @@ export function HomeFinancePreview({
       title={pl.home.financeSection}
       subtitle={formatFinanceMonth(year, month)}
       icon={WalletIcon}
+      interactiveContent
     >
       {isLoading && !plan ? (
         <HomeFinanceSkeleton />
@@ -76,7 +78,7 @@ function HomeFinanceContent({ plan }: { plan: HouseholdPlanDto }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div>
         <p className="text-xs text-muted-foreground">
           {pl.finance.household.savings}
@@ -92,6 +94,31 @@ function HomeFinanceContent({ plan }: { plan: HouseholdPlanDto }) {
         {pl.finance.household.costs}:{" "}
         {formatCurrency(summary.totalCosts, summary.currency)}
       </p>
+      {plan.expenses.length > 0 ? (
+        <div className="space-y-1.5">
+          <p className="text-xs font-medium text-muted-foreground">
+            {pl.finance.household.expenses}
+          </p>
+          <ul className="space-y-1">
+            {plan.expenses.map((line) => (
+              <li
+                key={line.id}
+                className="flex items-center justify-between gap-3 text-sm"
+              >
+                <span className="truncate">{line.title}</span>
+                <span className="shrink-0 tabular-nums">
+                  {formatCurrency(line.amount, summary.currency)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      <PersonalCostDisclosure
+        groups={plan.personalGroups}
+        currency={summary.currency}
+        showHeading
+      />
     </div>
   );
 }

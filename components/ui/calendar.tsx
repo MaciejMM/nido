@@ -17,7 +17,7 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   captionLayout = "label",
-  buttonVariant = "ghost",
+  buttonVariant = "outline",
   locale,
   formatters,
   components,
@@ -56,12 +56,12 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
+          "size-9 border-border bg-secondary p-0 text-foreground select-none aria-disabled:opacity-50",
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
+          "size-9 border-border bg-secondary p-0 text-foreground select-none aria-disabled:opacity-50",
           defaultClassNames.button_next
         ),
         month_caption: cn(
@@ -90,7 +90,7 @@ function Calendar({
         month_grid: cn("w-full", defaultClassNames.month_grid),
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
-          "flex-1 pb-2 text-center text-xs font-medium text-muted-foreground capitalize select-none",
+          "flex-1 pb-2 text-center text-xs font-semibold text-foreground/80 capitalize select-none",
           defaultClassNames.weekday
         ),
         week: cn("flex w-full", defaultClassNames.week),
@@ -103,7 +103,7 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          "group/day relative aspect-square h-full w-full rounded-(--cell-radius) p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius)",
+          "group/day relative aspect-square h-full w-full p-0.5 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius)",
           props.showWeekNumber
             ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-(--cell-radius)"
             : "[&:first-child[data-selected=true]_button]:rounded-l-(--cell-radius)",
@@ -203,7 +203,6 @@ function CalendarDayButton({
     <Button
       ref={ref}
       variant="ghost"
-      size="icon"
       data-day={day.date.toLocaleDateString(locale?.code)}
       data-selected-single={
         modifiers.selected &&
@@ -213,14 +212,23 @@ function CalendarDayButton({
       data-range-end={showRangeStyle && modifiers.range_end}
       data-range-middle={showRangeStyle && modifiers.range_middle}
       className={cn(
-        "aspect-square size-auto w-full min-w-0 flex-col gap-1 rounded-(--cell-radius) border-0 p-0 text-sm leading-none font-normal",
-        "group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50",
-        "data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-transparent data-[range-middle=true]:text-foreground data-[range-middle=true]:hover:bg-transparent",
-        "data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-start=true]:hover:bg-primary data-[range-start=true]:hover:text-primary-foreground",
-        "data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-end=true]:hover:bg-primary data-[range-end=true]:hover:text-primary-foreground",
-        "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground",
-        "hover:bg-muted/80 hover:text-foreground",
         defaultClassNames.day_button,
+        "aspect-square !h-full !w-full min-h-11 min-w-0 flex-col gap-1 rounded-full border border-border bg-secondary !p-0 text-base leading-none font-semibold text-foreground",
+        "hover:border-primary/40 hover:bg-accent hover:text-foreground",
+        modifiers.weekend &&
+          !showRangeStyle &&
+          !modifiers.selected &&
+          "border-dashed bg-muted/50 font-medium text-muted-foreground",
+        modifiers.outside && "opacity-45",
+        modifiers.today &&
+          !modifiers.selected &&
+          !showRangeStyle &&
+          "ring-2 ring-primary ring-offset-1 ring-offset-card",
+        "group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50",
+        "data-[range-middle=true]:rounded-none data-[range-middle=true]:border-transparent data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-middle=true]:hover:bg-accent",
+        "data-[range-start=true]:rounded-full data-[range-start=true]:border-transparent data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-start=true]:hover:bg-primary data-[range-start=true]:hover:text-primary-foreground",
+        "data-[range-end=true]:rounded-full data-[range-end=true]:border-transparent data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-end=true]:hover:bg-primary data-[range-end=true]:hover:text-primary-foreground",
+        "data-[selected-single=true]:border-transparent data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:hover:bg-primary data-[selected-single=true]:hover:text-primary-foreground",
         className
       )}
       {...props}

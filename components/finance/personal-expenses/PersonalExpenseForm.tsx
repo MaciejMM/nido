@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { XIcon } from "lucide-react";
 
+import { OptionalCategoryField } from "@/components/finance/OptionalCategoryField";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +24,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { useCategories } from "@/hooks/finance/use-categories";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { pl } from "@/lib/i18n";
 import type {
@@ -53,10 +55,12 @@ export function PersonalExpenseForm({
 }: PersonalExpenseFormProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const isEdit = Boolean(expense);
+  const { categories } = useCategories();
 
   const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -65,10 +69,12 @@ export function PersonalExpenseForm({
       setAmount(String(expense.amount));
       setTitle(expense.title);
       setNotes(expense.notes ?? "");
+      setCategoryId(expense.categoryId ?? "");
     } else {
       setAmount("");
       setTitle("");
       setNotes("");
+      setCategoryId("");
     }
   }, [open, expense]);
 
@@ -87,6 +93,7 @@ export function PersonalExpenseForm({
             title: title.trim(),
             amount: parsedAmount,
             notes: notes.trim() || null,
+            categoryId: categoryId || null,
           },
           expense.id,
         );
@@ -98,6 +105,7 @@ export function PersonalExpenseForm({
           title: title.trim(),
           amount: parsedAmount,
           notes: notes.trim() || undefined,
+          categoryId: categoryId || null,
         });
         toast.success(pl.finance.personalExpenses.created);
       }
@@ -128,6 +136,11 @@ export function PersonalExpenseForm({
           onChange={(e) => setAmount(e.target.value)}
         />
       </div>
+      <OptionalCategoryField
+        categories={categories}
+        value={categoryId}
+        onChange={setCategoryId}
+      />
       <div className="space-y-2">
         <Label>{pl.finance.personalExpenses.notes}</Label>
         <Textarea

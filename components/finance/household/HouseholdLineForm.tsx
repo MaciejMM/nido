@@ -4,6 +4,7 @@ import { XIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { OptionalCategoryField } from "@/components/finance/OptionalCategoryField";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +23,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useCategories } from "@/hooks/finance/use-categories";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { pl } from "@/lib/i18n";
 import type {
@@ -66,8 +68,12 @@ function HouseholdLineFormBody({
 }: HouseholdLineFormProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const isEdit = Boolean(line);
+  const { categories } = useCategories();
   const [amount, setAmount] = useState(line ? String(line.amount) : "");
   const [title, setTitle] = useState(line?.title ?? "");
+  const [categoryId, setCategoryId] = useState(
+    line?.kind === "expense" ? (line.categoryId ?? "") : "",
+  );
   const [submitting, setSubmitting] = useState(false);
 
   const dialogTitle = isEdit
@@ -89,7 +95,11 @@ function HouseholdLineFormBody({
     try {
       if (isEdit && line) {
         await onSubmit(
-          { title: title.trim(), amount: parsedAmount },
+          {
+            title: title.trim(),
+            amount: parsedAmount,
+            ...(kind === "expense" ? { categoryId: categoryId || null } : {}),
+          },
           line.id,
         );
         toast.success(pl.finance.household.updated);
@@ -100,6 +110,7 @@ function HouseholdLineFormBody({
           kind,
           title: title.trim(),
           amount: parsedAmount,
+          ...(kind === "expense" ? { categoryId: categoryId || null } : {}),
         });
         toast.success(pl.finance.household.created);
       }
@@ -139,6 +150,13 @@ function HouseholdLineFormBody({
           onChange={(event) => setAmount(event.target.value)}
         />
       </div>
+      {kind === "expense" ? (
+        <OptionalCategoryField
+          categories={categories}
+          value={categoryId}
+          onChange={setCategoryId}
+        />
+      ) : null}
     </div>
   );
 

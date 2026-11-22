@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const amountSchema = z.coerce.number().min(0);
+const optionalCategoryIdSchema = z.string().trim().min(1).nullable().optional();
 const monthSchema = z.coerce.number().int().min(1).max(12);
 const yearSchema = z.coerce.number().int().min(2000).max(2100);
 
@@ -16,12 +17,14 @@ export const createHouseholdLineSchema = z.object({
   title: z.string().trim().min(1).max(200),
   amount: amountSchema,
   notes: z.string().trim().max(1000).optional(),
+  categoryId: optionalCategoryIdSchema,
 });
 
 export const updateHouseholdLineSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
   amount: amountSchema.optional(),
   notes: z.string().trim().max(1000).optional().nullable(),
+  categoryId: optionalCategoryIdSchema,
 });
 
 export const updateHouseholdSettingsSchema = z.object({

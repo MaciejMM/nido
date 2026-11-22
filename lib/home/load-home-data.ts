@@ -1,5 +1,6 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
+import { kindeDisplayName } from "@/lib/auth/require-kinde-user";
 import { connectMongo } from "@/lib/db";
 import { buildHouseholdPlanView } from "@/lib/finance/household-summary";
 import * as entryService from "@/services/entry.service";
@@ -39,7 +40,7 @@ export async function loadHomePageData(): Promise<HomePageData> {
     personalInclusion: "consolidated",
     incomes: [],
     expenses: [],
-    personalItems: [],
+    personalOwners: [],
   });
 
   const [stats, entries, users, household] = await Promise.all([
@@ -47,7 +48,12 @@ export async function loadHomePageData(): Promise<HomePageData> {
     entryService.listEntries({ year }),
     userService.getParents(),
     user?.id
-      ? householdPlanService.getHouseholdPlan(user.id, year, month)
+      ? householdPlanService.getHouseholdPlan(
+          user.id,
+          year,
+          month,
+          kindeDisplayName(user),
+        )
       : Promise.resolve(emptyHousehold),
   ]);
 

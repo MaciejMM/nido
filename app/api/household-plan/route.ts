@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
       auth.kindeUserId,
       parsed.data.year,
       parsed.data.month,
+      auth.displayName,
     );
     return NextResponse.json(data);
   } catch (error) {

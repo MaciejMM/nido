@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { HouseholdSummaryCards } from "@/components/finance/household/HouseholdSummaryCards";
+import { PersonalCostDisclosure } from "@/components/finance/household/PersonalCostDisclosure";
 import { FinanceMonthSwitcher } from "@/components/finance/FinanceMonthSwitcher";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -49,24 +50,17 @@ export default function FinanceDashboardPage() {
             rows={plan.expenses.map((line) => ({
               id: line.id,
               label: line.title,
+              detail: line.category?.name,
               amount: line.amount,
             }))}
             currency={currency}
           />
-          {plan.personalInclusion !== "none" ? (
-            <Breakdown
-              title={pl.finance.household.personalSection}
-              rows={plan.personalLines.map((line) => ({
-                id: line.id,
-                label:
-                  line.source === "consolidated"
-                    ? pl.finance.household.consolidatedTitle
-                    : line.title,
-                amount: line.amount,
-              }))}
-              currency={currency}
-            />
-          ) : null}
+          <PersonalCostDisclosure
+            groups={plan.personalGroups}
+            currency={currency}
+            framed
+            showHeading
+          />
         </div>
       ) : null}
 
@@ -90,7 +84,7 @@ function Breakdown({
   currency,
 }: {
   title: string;
-  rows: { id: string; label: string; amount: number }[];
+  rows: { id: string; label: string; detail?: string; amount: number }[];
   currency: string;
 }) {
   if (rows.length === 0) return null;
@@ -104,7 +98,14 @@ function Breakdown({
             key={row.id}
             className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm"
           >
-            <span className="truncate">{row.label}</span>
+            <span className="min-w-0">
+              <span className="block truncate">{row.label}</span>
+              {row.detail ? (
+                <span className="block truncate text-xs text-muted-foreground">
+                  {row.detail}
+                </span>
+              ) : null}
+            </span>
             <span className="shrink-0 tabular-nums">
               {formatCurrency(row.amount, currency)}
             </span>

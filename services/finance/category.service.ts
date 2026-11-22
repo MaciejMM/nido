@@ -141,6 +141,34 @@ export async function getCategoryById(
   return category ? toCategoryDto(category) : null;
 }
 
+export async function loadCategoriesByIds(
+  ids: string[],
+  householdId = DEFAULT_HOUSEHOLD_ID,
+): Promise<Map<string, ExpenseCategoryDto>> {
+  const unique = [...new Set(ids.filter((id) => Types.ObjectId.isValid(id)))];
+  if (unique.length === 0) return new Map();
+
+  const categories = await ExpenseCategory.find({
+    _id: { $in: unique },
+    householdId,
+  }).exec();
+
+  return new Map(
+    categories.map((category) => [category._id.toString(), toCategoryDto(category)]),
+  );
+}
+
+export async function requireCategoryObjectId(
+  categoryId: string,
+  householdId = DEFAULT_HOUSEHOLD_ID,
+): Promise<Types.ObjectId> {
+  const category = await getCategoryById(categoryId, householdId);
+  if (!category) {
+    throw new NotFoundError(pl.finance.errors.categoryNotFound);
+  }
+  return new Types.ObjectId(category.id);
+}
+
 export async function deleteCategory(
   id: string,
   householdId = DEFAULT_HOUSEHOLD_ID,
