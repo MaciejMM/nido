@@ -34,15 +34,19 @@ export function toCategoryDto(category: IExpenseCategory): ExpenseCategoryDto {
 export async function seedDefaultCategories(
   householdId = DEFAULT_HOUSEHOLD_ID,
 ): Promise<void> {
-  const existing = await ExpenseCategory.countDocuments({
-    householdId,
-    isDefault: true,
-  }).exec();
+  const existing = await ExpenseCategory.find({ householdId })
+    .select("name")
+    .lean()
+    .exec();
+  const names = new Set(existing.map((category) => category.name));
+  const missing = DEFAULT_EXPENSE_CATEGORIES.filter(
+    (category) => !names.has(category.name),
+  );
 
-  if (existing > 0) return;
+  if (missing.length === 0) return;
 
   await ExpenseCategory.insertMany(
-    DEFAULT_EXPENSE_CATEGORIES.map((cat) => ({
+    missing.map((cat) => ({
       ...cat,
       householdId,
       isDefault: true,

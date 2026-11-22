@@ -5,5 +5,12 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
   { name: "Dziecko", icon: "Baby", color: "var(--chart-4)" },
   { name: "Rozrywka", icon: "Gamepad2", color: "var(--chart-5)" },
   { name: "Rachunki", icon: "Receipt", color: "var(--chart-1)" },
+  { name: "Zdrowie", icon: "HeartPulse", color: "var(--chart-3)" },
+  { name: "Dom", icon: "Home", color: "var(--chart-4)" },
+  { name: "Edukacja", icon: "GraduationCap", color: "var(--chart-5)" },
+  { name: "Ubrania", icon: "Shirt", color: "var(--chart-2)" },
+  { name: "Podróże", icon: "Plane", color: "var(--chart-3)" },
+  { name: "Sport", icon: "Dumbbell", color: "var(--chart-4)" },
+  { name: "Zwierzęta", icon: "PawPrint", color: "var(--chart-5)" },
   { name: "Inne", icon: "MoreHorizontal", color: "var(--chart-2)" },
 ] as const;

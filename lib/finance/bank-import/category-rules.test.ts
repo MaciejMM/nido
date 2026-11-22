@@ -45,6 +45,11 @@ describe("category-rules", () => {
     expect(resolveCategoryId(categories, "Rachunki")).toBe("2");
   });
 
+  it("maps pharmacy and home stores to their categories", () => {
+    expect(resolveCategoryName("APTEKA ZDROWIE", "Zakup")).toBe("Zdrowie");
+    expect(resolveCategoryName("IKEA", "Zakup")).toBe("Dom");
+  });
+
   it("falls back to Inne for unknown merchants", () => {
     expect(resolveCategoryName("VEMAT XYZ", "BLIK")).toBe("Inne");
     expect(resolveCategoryId(categories, "Inne")).toBe("3");
