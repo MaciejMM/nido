@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { CategoryMark } from "@/components/finance/CategoryMark";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { pl } from "@/lib/i18n";
 import type { HouseholdPersonalLine } from "@/types";
 
@@ -62,7 +62,7 @@ export function HouseholdPersonalLines({
               ) : null}
             </div>
             <p className="shrink-0 text-sm font-medium tabular-nums">
-              {formatCurrency(line.amount, currency)}
+              <Money amount={line.amount} currency={currency} />
             </p>
           </li>
         ))}

@@ -186,8 +186,7 @@ export const pl = {
       accountBalance: "Na koncie",
       accountBalanceAsOf: (date: string) => `Stan na ${date}`,
       accountBalanceFromImport: "Z ostatniego importu CSV",
-      paycheckSince: (date: string, amount: string) =>
-        `Od wpływu ${amount} (${date})`,
+      paycheckSinceLead: "Od wpływu",
       remaining: "Pozostało",
       limit: "Limit miesięczny",
       dailyAllowance: "Średnio na pozostałe dni",
@@ -527,6 +526,8 @@ export const pl = {
   common: {
     loading: "Ładowanie…",
     toggleTheme: "Przełącz motyw",
+    hideAmounts: "Ukryj kwoty",
+    showAmounts: "Pokaż kwoty",
     requestFailed: "Żądanie nie powiodło się",
     loadStatsFailed: "Nie udało się załadować statystyk",
     loadEntriesFailed: "Nie udało się załadować wpisów",

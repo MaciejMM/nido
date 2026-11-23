@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 
 import { getCategoryIcon } from "@/lib/finance/category-icons";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { dateLocale } from "@/lib/locale";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -78,7 +78,7 @@ function ExpenseRows({
               </p>
             </div>
             <p className="shrink-0 font-semibold tabular-nums">
-              {formatCurrency(expense.amount, expense.currency)}
+              <Money amount={expense.amount} currency={expense.currency} />
             </p>
             <div className="flex shrink-0 gap-1">
               <Button

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CategoryMark } from "@/components/finance/CategoryMark";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { pl } from "@/lib/i18n";
 import type { HouseholdLineDto } from "@/types";
 
@@ -93,7 +93,7 @@ export function HouseholdLineList({
                 />
               ) : null}
               <p className="text-sm tabular-nums text-muted-foreground">
-                {formatCurrency(item.amount, currency)}
+                <Money amount={item.amount} currency={currency} />
               </p>
             </div>
             <Button

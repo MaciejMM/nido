@@ -142,6 +142,7 @@ function HouseholdLineFormBody({
         </Label>
         <Input
           id="household-line-amount"
+          className="sensitive-amount"
           type="number"
           min={0}
           step={0.01}

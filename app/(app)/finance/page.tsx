@@ -8,7 +8,7 @@ import { FinanceMonthSwitcher } from "@/components/finance/FinanceMonthSwitcher"
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useHouseholdPlan } from "@/hooks/finance/use-household-plan";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { pl } from "@/lib/i18n";
 import { useFinanceUiStore } from "@/stores/finance-ui.store";
 
@@ -107,7 +107,7 @@ function Breakdown({
               ) : null}
             </span>
             <span className="shrink-0 tabular-nums">
-              {formatCurrency(row.amount, currency)}
+              <Money amount={row.amount} currency={currency} />
             </span>
           </li>
         ))}

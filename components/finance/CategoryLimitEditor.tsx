@@ -80,7 +80,7 @@ export function CategoryLimitEditor({
             void handleSave();
           }
         }}
-        className="h-8 w-28"
+        className="sensitive-amount h-8 w-28"
       />
       <Button
         type="button"

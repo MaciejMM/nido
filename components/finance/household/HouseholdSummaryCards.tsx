@@ -1,6 +1,7 @@
 "use client";
 
-import { formatCurrency, formatPercent } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
+import { formatPercent } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -48,7 +49,7 @@ export function HouseholdSummaryCards({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums">
-              {formatCurrency(summary.totalIncome, summary.currency)}
+              <Money amount={summary.totalIncome} currency={summary.currency} />
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {pl.finance.household.incomeHint}
@@ -64,14 +65,14 @@ export function HouseholdSummaryCards({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums">
-              {formatCurrency(summary.totalCosts, summary.currency)}
+              <Money amount={summary.totalCosts} currency={summary.currency} />
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {pl.finance.household.householdCosts}:{" "}
-              {formatCurrency(summary.householdExpenses, summary.currency)}
+              <Money amount={summary.householdExpenses} currency={summary.currency} />
               {" · "}
               {pl.finance.household.personalCosts}:{" "}
-              {formatCurrency(summary.personalExpenses, summary.currency)}
+              <Money amount={summary.personalExpenses} currency={summary.currency} />
             </p>
           </CardContent>
         </Card>
@@ -85,7 +86,7 @@ export function HouseholdSummaryCards({
         </CardHeader>
         <CardContent>
           <p className={`text-3xl font-semibold tabular-nums ${savingsClass}`}>
-            {formatCurrency(summary.savings, summary.currency)}
+            <Money amount={summary.savings} currency={summary.currency} />
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {summary.savings < 0

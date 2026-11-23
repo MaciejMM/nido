@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { CategoryMark } from "@/components/finance/CategoryMark";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -127,7 +127,7 @@ export function PersonalExpenseList({
                   item.isPaid ? "text-muted-foreground" : ""
                 }`}
               >
-                {formatCurrency(item.amount, item.currency)}
+                <Money amount={item.amount} currency={item.currency} />
               </p>
               <div className="flex shrink-0 gap-1">
                 <Button

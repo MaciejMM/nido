@@ -33,7 +33,9 @@ export function AiInsightCard({ analysis, loading }: AiInsightCardProps) {
 
         {!loading && analysis && (
           <>
-            <p className="text-sm text-muted-foreground">{analysis.summary}</p>
+            <p className="sensitive-amount text-sm text-muted-foreground">
+              {analysis.summary}
+            </p>
             <ul className="space-y-2">
               {analysis.insights.map((insight) => (
                 <li
@@ -44,7 +46,9 @@ export function AiInsightCard({ analysis, loading }: AiInsightCardProps) {
                   )}
                 >
                   <p className="font-medium">{insight.title}</p>
-                  <p className="mt-0.5 text-muted-foreground">{insight.message}</p>
+                  <p className="sensitive-amount mt-0.5 text-muted-foreground">
+                    {insight.message}
+                  </p>
                 </li>
               ))}
             </ul>

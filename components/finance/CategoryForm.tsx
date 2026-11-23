@@ -74,6 +74,7 @@ export function CategoryForm({ onSubmit }: CategoryFormProps) {
       <div className="space-y-2">
         <Label>{pl.finance.categories.monthlyLimit}</Label>
         <Input
+          className="sensitive-amount"
           type="number"
           min={0}
           step={1}

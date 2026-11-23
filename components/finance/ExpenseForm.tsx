@@ -87,6 +87,7 @@ function ExpenseFormFields({
     <div className="space-y-2">
       <Label>{pl.finance.expenses.amount}</Label>
       <Input
+        className="sensitive-amount"
         type="number"
         min={0}
         step={0.01}

@@ -7,7 +7,8 @@ import { PersonalCostDisclosure } from "@/components/finance/household/PersonalC
 import { HomeOverviewCard } from "@/components/home/HomeOverviewCard";
 import { financeKeys } from "@/hooks/finance/query-keys";
 import { fetchHouseholdPlan } from "@/lib/household-plan-api-client";
-import { formatCurrency, formatFinanceMonth } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
+import { formatFinanceMonth } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import { useFinanceUiStore } from "@/stores/finance-ui.store";
 import type { HouseholdPlanDto } from "@/types";
@@ -84,15 +85,15 @@ function HomeFinanceContent({ plan }: { plan: HouseholdPlanDto }) {
           {pl.finance.household.savings}
         </p>
         <p className={`text-2xl font-semibold tabular-nums ${savingsClass}`}>
-          {formatCurrency(summary.savings, summary.currency)}
+          <Money amount={summary.savings} currency={summary.currency} />
         </p>
       </div>
       <p className="text-xs text-muted-foreground">
         {pl.finance.household.income}:{" "}
-        {formatCurrency(summary.totalIncome, summary.currency)}
+        <Money amount={summary.totalIncome} currency={summary.currency} />
         {" · "}
         {pl.finance.household.costs}:{" "}
-        {formatCurrency(summary.totalCosts, summary.currency)}
+        <Money amount={summary.totalCosts} currency={summary.currency} />
       </p>
       {plan.expenses.length > 0 ? (
         <div className="space-y-1.5">
@@ -107,7 +108,7 @@ function HomeFinanceContent({ plan }: { plan: HouseholdPlanDto }) {
               >
                 <span className="truncate">{line.title}</span>
                 <span className="shrink-0 tabular-nums">
-                  {formatCurrency(line.amount, summary.currency)}
+                  <Money amount={line.amount} currency={summary.currency} />
                 </span>
               </li>
             ))}
