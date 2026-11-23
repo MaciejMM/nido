@@ -128,6 +128,7 @@ export function PersonalExpenseForm({
       <div className="space-y-2">
         <Label>{pl.finance.personalExpenses.amount}</Label>
         <Input
+          className="sensitive-amount"
           type="number"
           min={0}
           step={0.01}

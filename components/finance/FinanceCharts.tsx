@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { Money } from "@/components/finance/Money";
 import { formatCurrency } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +62,7 @@ function ChartCard({
           </p>
         )}
         {!loading && !empty && (
-          <div className="w-full min-w-0" style={{ height: chartHeight }}>
+          <div className="sensitive-chart w-full min-w-0" style={{ height: chartHeight }}>
             {children}
           </div>
         )}
@@ -104,7 +105,7 @@ function ShareList({
                 ) : null}
               </span>
               <span className="shrink-0 tabular-nums">
-                {formatCurrency(item.amount, currency)}
+                <Money amount={item.amount} currency={currency} />
               </span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -271,7 +272,10 @@ export function FinanceCharts({ plan, trend, loading }: FinanceChartsProps) {
                   className="stroke-border"
                   horizontal={false}
                 />
-                <XAxis type="number" tick={{ fontSize: 11 }} />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11, className: "sensitive-amount" }}
+                />
                 <YAxis
                   type="category"
                   dataKey="name"
@@ -337,12 +341,12 @@ export function FinanceCharts({ plan, trend, loading }: FinanceChartsProps) {
           )}
           {!loading && !trendEmpty && (
             <>
-              <div className="w-full min-w-0" style={{ height: CHART_HEIGHT }}>
+              <div className="sensitive-chart w-full min-w-0" style={{ height: CHART_HEIGHT }}>
                 <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={0}>
                   <BarChart data={trend} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                     <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11, className: "sensitive-amount" }} />
                     <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
                     <Bar
                       dataKey="income"

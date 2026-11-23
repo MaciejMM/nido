@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { pl } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,7 +40,7 @@ export function PersonalExpenseSummaryCards({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums">
-              {formatCurrency(summary.totalAmount, summary.currency)}
+              <Money amount={summary.totalAmount} currency={summary.currency} />
             </p>
             {totalCount > 0 && (
               <p className="mt-1 text-xs text-muted-foreground">
@@ -61,7 +61,7 @@ export function PersonalExpenseSummaryCards({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
-              {formatCurrency(summary.paidAmount, summary.currency)}
+              <Money amount={summary.paidAmount} currency={summary.currency} />
             </p>
           </CardContent>
         </Card>
@@ -75,7 +75,7 @@ export function PersonalExpenseSummaryCards({
         </CardHeader>
         <CardContent>
           <p className="text-2xl font-semibold tabular-nums">
-            {formatCurrency(summary.remainingAmount, summary.currency)}
+            <Money amount={summary.remainingAmount} currency={summary.currency} />
           </p>
         </CardContent>
       </Card>

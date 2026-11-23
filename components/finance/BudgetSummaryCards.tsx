@@ -4,7 +4,8 @@ import Link from "next/link";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
-import { formatCurrency, formatPercent } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
+import { formatPercent } from "@/lib/finance/format";
 import { dateLocale } from "@/lib/locale";
 import { pl } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +71,10 @@ export function BudgetSummaryCards({
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold tabular-nums">
-              {formatCurrency(dashboard.accountBalance!, dashboard.currency)}
+              <Money
+                amount={dashboard.accountBalance!}
+                currency={dashboard.currency}
+              />
             </p>
             {balanceAsOfLabel && (
               <p className="mt-1 text-xs text-muted-foreground">
@@ -93,22 +97,21 @@ export function BudgetSummaryCards({
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold tabular-nums">
-              {formatCurrency(dashboard.spent, dashboard.currency)}
+              <Money amount={dashboard.spent} currency={dashboard.currency} />
             </p>
             {hasPaycheckCycle && paycheckDateLabel && dashboard.paycheckAnchor ? (
               <p className="mt-1 text-xs text-muted-foreground">
-                {pl.finance.dashboard.paycheckSince(
-                  paycheckDateLabel,
-                  formatCurrency(
-                    dashboard.paycheckAnchor.amount,
-                    dashboard.currency,
-                  ),
-                )}
+                {pl.finance.dashboard.paycheckSinceLead}{" "}
+                <Money
+                  amount={dashboard.paycheckAnchor.amount}
+                  currency={dashboard.currency}
+                />{" "}
+                ({paycheckDateLabel})
               </p>
             ) : hasLimit ? (
               <p className="mt-1 text-xs text-muted-foreground">
                 {pl.finance.dashboard.limit}:{" "}
-                {formatCurrency(dashboard.limitAmount, dashboard.currency)}
+                <Money amount={dashboard.limitAmount} currency={dashboard.currency} />
               </p>
             ) : null}
           </CardContent>
@@ -126,7 +129,7 @@ export function BudgetSummaryCards({
                 dashboard.remaining < 0 ? "text-destructive" : ""
               }`}
             >
-              {formatCurrency(dashboard.remaining, dashboard.currency)}
+              <Money amount={dashboard.remaining} currency={dashboard.currency} />
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {pl.finance.dashboard.daysLeft(dashboard.daysLeft)}
@@ -147,7 +150,10 @@ export function BudgetSummaryCards({
               {dashboard.daysLeft > 0 && (
                 <p className="text-xs text-muted-foreground">
                   {pl.finance.dashboard.dailyAllowance}:{" "}
-                  {formatCurrency(dashboard.dailyAllowance, dashboard.currency)}
+                  <Money
+                    amount={dashboard.dailyAllowance}
+                    currency={dashboard.currency}
+                  />
                 </p>
               )}
               {dashboard.projectedOverspend && (

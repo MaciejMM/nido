@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { pl } from "@/lib/i18n";
 import { fetchPersonalExpenses } from "@/lib/personal-expense-api-client";
 import type { CopyFromPreviousMonthInput, PersonalExpenseDto } from "@/types";
@@ -208,7 +208,7 @@ export function CopyFromPreviousMonthButton({
                         )}
                       </div>
                       <p className="shrink-0 text-sm font-semibold tabular-nums">
-                        {formatCurrency(item.amount, item.currency)}
+                        <Money amount={item.amount} currency={item.currency} />
                       </p>
                     </li>
                   ))}

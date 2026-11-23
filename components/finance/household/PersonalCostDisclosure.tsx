@@ -4,7 +4,7 @@ import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 
 import { CategoryMark } from "@/components/finance/CategoryMark";
-import { formatCurrency } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
 import { pl } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { HouseholdPersonalGroup } from "@/types";
@@ -31,7 +31,7 @@ function GroupRow({
       <div className="flex items-center justify-between gap-3 text-sm">
         <span className="truncate">{group.label}</span>
         <span className="shrink-0 font-medium tabular-nums">
-          {formatCurrency(group.total, currency)}
+          <Money amount={group.total} currency={currency} />
         </span>
       </div>
     );
@@ -56,7 +56,7 @@ function GroupRow({
           <span className="truncate">{group.label}</span>
         </span>
         <span className="shrink-0 font-medium tabular-nums">
-          {formatCurrency(group.total, currency)}
+          <Money amount={group.total} currency={currency} />
         </span>
       </button>
       {open ? (
@@ -79,7 +79,7 @@ function GroupRow({
                 ) : null}
               </span>
               <span className="shrink-0 tabular-nums">
-                {formatCurrency(line.amount, currency)}
+                <Money amount={line.amount} currency={currency} />
               </span>
             </li>
           ))}

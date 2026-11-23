@@ -1,6 +1,7 @@
 "use client";
 
-import { formatCurrency, formatPercent } from "@/lib/finance/format";
+import { Money } from "@/components/finance/Money";
+import { formatPercent } from "@/lib/finance/format";
 import { pl } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { CategorySpendItem, ExpenseCategoryDto } from "@/types";
@@ -33,7 +34,7 @@ export function CategoryLimitProgress({
         <span className="shrink-0 text-muted-foreground tabular-nums">
           {hasLimit ? (
             <>
-              {formatCurrency(spent)} / {formatCurrency(limitAmount)}
+              <Money amount={spent} /> / <Money amount={limitAmount} />
               {utilizationPercent != null && (
                 <span className="ml-1.5 font-medium text-foreground">
                   ({formatPercent(utilizationPercent)})
@@ -41,7 +42,7 @@ export function CategoryLimitProgress({
               )}
             </>
           ) : (
-            formatCurrency(spent)
+            <Money amount={spent} />
           )}
         </span>
       </div>
