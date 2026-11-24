@@ -178,6 +178,10 @@ export const pl = {
       settings: "Ustawienia",
       home: "Start",
     },
+    period: {
+      notCurrent: "Przeglądasz inny miesiąc niż bieżący",
+      backToCurrent: "Wróć do bieżącego",
+    },
     dashboard: {
       title: "Finanse",
       subtitle: "Miesięczny budżet domu i oszczędności",
